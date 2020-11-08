@@ -106,8 +106,11 @@ export default {
     UPDATE_UPRM_STATISTICS(state) {
         let result = {
             freethrow: 0,
+            freethrowAttempt: 0,
             twopoints: 0,
+            twopointsAttempt: 0,
             threepoints: 0,
+            threepointsAttempt: 0,
             assists: 0,
             blocks: 0,
             rebounds: 0,
@@ -125,14 +128,29 @@ export default {
             switch (currentAction.action_type) {
                 case "Freethrow":
                     result.freethrow++;
+                    result.freethrowAttempt++;
                     break;
 
-                case "2 Points":
-                    result.twopoints +=2;
+                case "FreethrowMiss":
+                    result.freethrowAttempt++;
                     break;
 
-                case "3 Points":
-                    result.threepoints+=3;
+                case "2Points":
+                    result.twopoints++;
+                    result.twopointsAttempt++;
+                    break;
+
+                case "2PointsMiss":
+                    result.twopointsAttempt++;
+                    break;
+
+                case "3Points":
+                    result.threepoints++;
+                    result.threepointsAttempt++;
+                    break;
+                
+                case "3PointsMiss":
+                    result.threepointsAttempt++;
                     break;
 
                 case "Assist":
@@ -147,11 +165,11 @@ export default {
                     result.steals++;
                     break;
 
-                case "Rebounds":
+                case "Rebound":
                     result.rebounds++;
                     break;
 
-                case "Turnovers":
+                case "Turnover":
                     result.turnovers++;
                     break;
 
@@ -171,8 +189,11 @@ export default {
     UPDATE_OPP_STATISTICS(state) {
         let result = {
             freethrow: 0,
+            freethrowAttempt: 0,
             twopoints: 0,
+            twopointsAttempt: 0,
             threepoints: 0,
+            threepointsAttempt: 0,
             assists: 0,
             blocks: 0,
             rebounds: 0,
@@ -190,17 +211,29 @@ export default {
             switch (currentAction.action_type) {
                 case "Freethrow":
                     result.freethrow++;
+                    result.freethrowAttempt++;
                     break;
 
-                case "2 Points":
-                    result.twopoints++;
-                    result.twopoints++;
+                case "FreethrowMiss":
+                    result.freethrowAttempt++;
                     break;
 
-                case "3 Points":
+                case "2Points":
+                    result.twopoints++;
+                    result.twopointsAttempt++;
+                    break;
+
+                case "2PointsMiss":
+                    result.twopointsAttempt++;
+                    break;
+
+                case "3Points":
                     result.threepoints++;
-                    result.threepoints++;
-                    result.threepoints++;
+                    result.threepointsAttempt++;
+                    break;
+                
+                case "3PointsMiss":
+                    result.threepointsAttempt++;
                     break;
 
                 case "Assist":
@@ -215,11 +248,11 @@ export default {
                     result.steals++;
                     break;
 
-                case "Rebounds":
+                case "Rebound":
                     result.rebounds++;
                     break;
 
-                case "Turnovers":
+                case "Turnover":
                     result.turnovers++;
                     break;
 
@@ -243,9 +276,16 @@ export default {
                 {
                     name: (state.uprmRoster[athlete].middle_name === '' ? state.uprmRoster[athlete].first_name + ' ' + state.uprmRoster[athlete].middle_name + ' ' + state.uprmRoster[athlete].last_names : state.uprmRoster[athlete].first_name + ' ' + state.uprmRoster[athlete].last_names),
                     number: state.uprmRoster[athlete].number,
+                    points:0,
                     freethrow: 0,
+                    freethrowAttempt: 0,
+                    freethrowPercentage:0,
                     twopoints: 0,
+                    twopointsAttempt: 0,
+                    twopointsPercentage:0,
                     threepoints: 0,
+                    threepointsAttempt: 0,
+                    threepointsPercentage:0,
                     assists: 0,
                     blocks: 0,
                     rebounds: 0,
@@ -277,16 +317,46 @@ export default {
             switch (currentAction.action_type) {
                 case "Freethrow":
                     result[athlete_index].freethrow++;
+                    result[athlete_index].freethrowAttempt++;
+                    result[athlete_index].points++;
+                    result[athlete_index].freethrowPercentage=result[athlete_index].freethrow/result[athlete_index].freethrowAttempt*100;
+                    result[athlete_index].freethrowPercentage=parseFloat(result[athlete_index].freethrowPercentage).toFixed(1);
                     break;
 
-                case "2 Points":
+                case "FreethrowMiss":
+                    result[athlete_index].freethrowAttempt++;
+                    result[athlete_index].freethrowPercentage=result[athlete_index].freethrow/result[athlete_index].freethrowAttempt*100;
+                    result[athlete_index].freethrowPercentage=parseFloat(result[athlete_index].freethrowPercentage).toFixed(1);
+                    break;
+
+                case "2Points":
                     result[athlete_index].twopoints++;
+                    result[athlete_index].twopointsAttempt++;
+                    result[athlete_index].points+2;
+                    result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
+                    result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
                     break;
 
-                case "3 Points":
+                case "2PointsMiss":
+                    result[athlete_index].twopointsAttempt++;
+                    result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
+                    result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
+                    break;
+
+                case "3Points":
                     result[athlete_index].threepoints++;
+                    result[athlete_index].threepointsAttempt++;
+                    result[athlete_index].points+3;
+                    result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
+                    result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
                     break;
-
+                
+                case "3PointsMiss":
+                    result[athlete_index].threepointsAttempt++;
+                    result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
+                    result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
+                    break;
+                    
                 case "Assist":
                     result[athlete_index].assists++;
                     break;
@@ -299,11 +369,11 @@ export default {
                     result[athlete_index].steals++;
                     break;
 
-                case "Rebounds":
+                case "Rebound":
                     result[athlete_index].rebounds++;
                     break;
 
-                case "Turnovers":
+                case "Turnover":
                     result[athlete_index].turnovers++;
                     break;
 
@@ -327,9 +397,16 @@ export default {
                 {
                     name: state.oppRoster[athlete].name,
                     number: state.oppRoster[athlete].number,
+                    points:0,
                     freethrow: 0,
+                    freethrowAttempt: 0,
+                    freethrowPercentage:0,
                     twopoints: 0,
+                    twopointsAttempt: 0,
+                    twopointsPercentage:0,
                     threepoints: 0,
+                    threepointsAttempt: 0,
+                    threepointsPercentage:0,
                     assists: 0,
                     blocks: 0,
                     rebounds: 0,
@@ -362,14 +439,44 @@ export default {
             switch (currentAction.action_type) {
                 case "Freethrow":
                     result[athlete_index].freethrow++;
+                    result[athlete_index].freethrowAttempt++;
+                    result[athlete_index].points++;
+                    result[athlete_index].freethrowPercentage=result[athlete_index].freethrow/result[athlete_index].freethrowAttempt*100;
+                    result[athlete_index].freethrowPercentage=parseFloat(result[athlete_index].freethrowPercentage).toFixed(1);
                     break;
 
-                case "2 Points":
+                case "FreethrowMiss":
+                    result[athlete_index].freethrowAttempt++;
+                    result[athlete_index].freethrowPercentage=result[athlete_index].freethrow/result[athlete_index].freethrowAttempt*100;
+                    result[athlete_index].freethrowPercentage=parseFloat(result[athlete_index].freethrowPercentage).toFixed(1);
+                    break;
+
+                case "2Points":
                     result[athlete_index].twopoints++;
+                    result[athlete_index].twopointsAttempt++;
+                    result[athlete_index].points+2;
+                    result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
+                    result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
                     break;
 
-                case "3 Points":
+                case "2PointsMiss":
+                    result[athlete_index].twopointsAttempt++;
+                    result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
+                    result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
+                    break;
+
+                case "3Points":
                     result[athlete_index].threepoints++;
+                    result[athlete_index].threepointsAttempt++;
+                    result[athlete_index].points+3;
+                    result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
+                    result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
+                    break;
+                
+                case "3PointsMiss":
+                    result[athlete_index].threepointsAttempt++;
+                    result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
+                    result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
                     break;
 
                 case "Assist":
@@ -384,11 +491,11 @@ export default {
                     result[athlete_index].steals++;
                     break;
 
-                case "Rebounds":
+                case "Rebound":
                     result[athlete_index].rebounds++;
                     break;
 
-                case "Turnovers":
+                case "Turnover":
                     result[athlete_index].turnovers++;
                     break;
 
@@ -447,8 +554,11 @@ export default {
         state.oppColor = "";
         state.uprmStatistics = {
             freethrow: 0,
+            freethrowAttempt: 0,
             twopoints: 0,
+            twopointsAttempt: 0,
             threepoints: 0,
+            threepointsAttempt: 0,
             assists: 0,
             blocks: 0,
             rebounds: 0,
@@ -458,8 +568,11 @@ export default {
         };
         state.oppStatistics = {
             freethrow: 0,
+            freethrowAttempt: 0,
             twopoints: 0,
+            twopointsAttempt: 0,
             threepoints: 0,
+            threepointsAttempt: 0,
             assists: 0,
             blocks: 0,
             rebounds: 0,
