@@ -19,6 +19,7 @@ export default {
             return state.uprmSets;
         }
     },
+    
     currentOppSet: state => {
         if (state.currentSet === 0) {
             return 0;
@@ -61,8 +62,39 @@ export default {
             return score;
         }
     },
-    uprmStatistics: state => state.uprmStatistics,
-    oppStatistics: state => state.oppStatistics,
+    uprmStatistics: (state) => {
+        let temp=state.uprmStatistics;
+        let ftpercentage=0;
+        ftpercentage=state.uprmStatistics.freethrow/state.uprmStatistics.freethrowAttempt*100;
+        ftpercentage=parseFloat(ftpercentage).toFixed(1);
+        temp["freethrowPercentage"]=ftpercentage;
+        let tppercentage=0;
+        tppercentage=state.uprmStatistics.twopoints/state.uprmStatistics.twopointsAttempt*100;
+        tppercentage=parseFloat(tppercentage).toFixed(1);
+        temp["twopointsPercentage"]=tppercentage;
+        let trppercentage=0;
+        trppercentage=state.uprmStatistics.threepoints/state.uprmStatistics.threepointsAttempt*100;
+        trppercentage=parseFloat(trppercentage).toFixed(1);
+        temp["threepointsPercentage"]=trppercentage;
+        return temp;
+    },
+    
+    oppStatistics: (state) => {
+        let temp=state.oppStatistics;
+        let ftpercentage=0;
+        ftpercentage=state.oppStatistics.freethrow/state.oppStatistics.freethrowAttempt*100;
+        ftpercentage=parseFloat(ftpercentage).toFixed(1);
+        temp["freethrowPercentage"]=ftpercentage;
+        let tppercentage=0;
+        tppercentage=state.oppStatistics.twopoints/state.oppStatistics.twopointsAttempt*100;
+        tppercentage=parseFloat(tppercentage).toFixed(1);
+        temp["twopointsPercentage"]=tppercentage;
+        let trppercentage=0;
+        trppercentage=state.oppStatistics.threepoints/state.oppStatistics.threepointsAttempt*100;
+        trppercentage=parseFloat(trppercentage).toFixed(1);
+        temp["threepointsPercentage"]=trppercentage;
+        return temp;
+    },
     uprmAthleteStatistics: state => state.uprmAthleteStatistics,
     oppAthleteStatistics: state => state.oppAthleteStatistics,
     sportName: state => state.sportName,
