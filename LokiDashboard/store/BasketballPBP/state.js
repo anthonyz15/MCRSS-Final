@@ -11,8 +11,11 @@ export default () => ({
     oppColor: "", // Keeps track of the opponent team color (for UI purposes).
     uprmStatistics: {
         freethrow: 0,
+        freethrowAttempt: 0,
         twopoints: 0,
+        twopointsAttempt: 0,
         threepoints: 0,
+        threepointsAttempt: 0,
         assists: 0,
         blocks: 0,
         rebounds: 0,
@@ -22,8 +25,11 @@ export default () => ({
     }, // Keep collective UPRM statistics for this match.
     oppStatistics: {
         freethrow: 0,
+        freethrowAttempt: 0,
         twopoints: 0,
+        twopointsAttempt: 0,
         threepoints: 0,
+        threepointsAttempt: 0,
         assists: 0,
         blocks: 0,
         rebounds: 0,
