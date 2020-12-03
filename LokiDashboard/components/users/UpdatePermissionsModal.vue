@@ -21,7 +21,7 @@
               </v-col>
               <v-checkbox
                 class="mx-3"
-                label="Añadir"
+                label="AÃ±adir"
                 v-model="permissions[0]['13']"
               ></v-checkbox>
               <v-checkbox
@@ -41,7 +41,7 @@
               </v-col>
               <v-checkbox
                 class="mx-3"
-                label="Añadir"
+                label="AÃ±adir"
                 v-model="permissions[3]['16']"
               ></v-checkbox>
               <v-checkbox
@@ -57,11 +57,11 @@
             </v-row>
             <v-row align="center">
               <v-col cols="12" sm="4">
-                <h2 class="font-weight-medium" v-text="'Estadísticas:'"></h2>
+                <h2 class="font-weight-medium" v-text="'EstadÃ­sticas:'"></h2>
               </v-col>
               <v-checkbox
                 class="mx-3"
-                label="Añadir"
+                label="AÃ±adir"
                 v-model="permissions[6]['19']"
               ></v-checkbox>
               <v-checkbox
@@ -81,7 +81,7 @@
               </v-col>
               <v-checkbox
                 class="mx-3"
-                label="Añadir"
+                label="AÃ±adir"
                 v-model="permissions[9]['22']"
               ></v-checkbox>
               <v-checkbox
@@ -101,7 +101,7 @@
               </v-col>
               <v-checkbox
                 class="mx-3"
-                label="Añadir"
+                label="AÃ±adir"
                 v-model="permissions[12]['25']"
               ></v-checkbox>
               <v-checkbox
@@ -113,6 +113,46 @@
                 class="mx-3"
                 label="Modificar"
                 v-model="permissions[14]['27']"
+              ></v-checkbox>
+            </v-row>
+            <v-row align="center">
+              <v-col cols="12" sm="4">
+                <h2 class="font-weight-medium" v-text="'Multimedia:'"></h2>
+              </v-col>
+              <v-checkbox
+                class="mx-3"
+                label="AÃ±adir"
+                v-model="permissions[15]['28']"
+              ></v-checkbox>
+              <v-checkbox
+                class="mx-3"
+                label="Borrar"
+                v-model="permissions[16]['29']"
+              ></v-checkbox>
+              <v-checkbox
+                class="mx-3"
+                label="Modificar"
+                v-model="permissions[17]['30']"
+              ></v-checkbox>
+            </v-row>
+            <v-row align="center">
+              <v-col cols="12" sm="4">
+                <h2 class="font-weight-medium" v-text="'Sobre Nosotros:'"></h2>
+              </v-col>
+              <v-checkbox
+                class="mx-3"
+                label="AÃ±adir"
+                v-model="permissions[18]['31']"
+              ></v-checkbox>
+                <v-checkbox
+                class="mx-3"
+                label="Borrar"
+                v-model="permissions[19]['32']"
+              ></v-checkbox>
+                <v-checkbox
+                class="mx-3"
+                label="Modificar"
+                v-model="permissions[20]['33']"
               ></v-checkbox>
             </v-row>
             <v-checkbox v-model="reviewed" label="He revisado mis cambios.">

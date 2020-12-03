@@ -15,6 +15,7 @@ export default {
     //If some other user data needs to be persisted, it can be added here as a property.
     localStorage.setItem('user', JSON.stringify({
       username:state.user.username,
+      id:state.user.id,
     }))
 
     //Set axios headers to contain the auth token by editing default axios config.

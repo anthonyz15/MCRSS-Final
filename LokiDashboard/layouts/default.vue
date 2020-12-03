@@ -20,7 +20,7 @@
             <v-icon>mdi-logout</v-icon>
           </v-btn>
         </template>
-        <span>Cerrar Sesión</span>
+        <span>Cerrar SesiÃ³n</span>
       </v-tooltip>
     </v-app-bar>
 
@@ -108,6 +108,16 @@ export default {
           icon: "mdi-calendar-multiple",
           title: "Eventos",
           to: "/eventos"
+        },
+        {
+          icon: "mdi-shape-square-plus",
+          title: "Multimedia",
+          to: "/multimedios"
+        },
+        {
+          icon: "mdi-information-outline",
+          title: "Sobre Nosotros",
+          to: "/sobrenosotros"
         }
       ],
       miniVariant: false,

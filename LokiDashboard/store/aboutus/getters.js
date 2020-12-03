@@ -1,16 +1,16 @@
 /**
  * Vuex store for multimedias, with actions, mutations, getters and state.
- * @module multimedias
+ * @module aboutus
  */
 
 export default{
     /**
      * Getter for loaded multimedia post state.
      */
-    multimedia: state => state.multimedia,
+    aboutus: state => state.aboutus,
     /**
      * Getter for loaded multimedia posts state.
      */
-    multimedias: state => state.multimedias,
+    aboutuss: state => state.aboutuss,
 
 }

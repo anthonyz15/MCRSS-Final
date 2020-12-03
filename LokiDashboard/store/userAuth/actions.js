@@ -11,9 +11,9 @@ export default {
       const response = await this.$auth.loginWith('local', { data: credentials }) //returns auth data as json.
       const user = await this.$axios.post('users/username/', credentials) //call get user by username to set auth user.
       await this.$auth.setUser(user.data.User) // Set auth user.
-      Cookie.set('user', JSON.stringify({username:user.data.User.username}))
+      Cookie.set('user', JSON.stringify({username:user.data.User.username,id:user.data.User.id}))
       dispatch('getUserPermissions', response.data.auth.token)
-      dispatch('notifications/setSnackbar', { text: 'Se ha iniciado la sessión!' }, { root: true })
+      dispatch('notifications/setSnackbar', { text: 'Se ha iniciado la sessiÃ³n!' }, { root: true })
       commit("SET_USER_DATA", response.data)
     } catch (error) {
       console.log(this.$axios.baseURL)
@@ -53,7 +53,7 @@ export default {
       await this.$axios.patch(`users/activate`, { username: credentials.username, password: credentials.password, new_password: credentials.new_password }) //call get user by username to set auth user.
       commit("DONE_LOADING")
       dispatch('login', { username: credentials.username, password: credentials.new_password })
-      dispatch('notifications/setSnackbar', { text: 'Cambio de contraseña exitoso! Iniciando sesión...' }, { root: true })
+      dispatch('notifications/setSnackbar', { text: 'Cambio de contraseÃ±a exitoso! Iniciando sesiÃ³n...' }, { root: true })
     } catch (error) {
       if (!!error.response) {
         dispatch('notifications/setSnackbar', { text: error.response.data.Error, color: 'error' }, { root: true })
