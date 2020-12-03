@@ -304,6 +304,48 @@ class BaseballEventDAO:
         result = cursor.fetchone()
         return result
 
+    def getAggregatedAthleteStatisticsCareer(self, aID, seasonYear):
+        """
+        Gets the aggregated statistics for a given athlete and season.
+
+        This function uses and ID and a year number to perform a query to the database
+        that gets the aggregated statistics in the system that match the given ID and season year.
+
+        Args:
+            aID: The ID of the athlete of which statistics need to be fetched.
+            seasonYear: the season year of which statistics need to be fetched.
+
+
+        Returns:
+            A list containing the response to the database query
+            containing the aggregated statistics in the system containing
+            the matching record for the given ID and season year.
+        """
+        cursor = self.conn.cursor()
+        query = """
+                with aggregate_query as(
+                SELECT
+                sum(at_bats) as at_bats,sum(runs) as runs, sum(hits) as hits,sum(runs_batted_in) as runs_batted_in,
+                sum(base_on_balls) as base_on_balls,sum(strikeouts) as strikeouts,sum(left_on_base) as left_on_base,
+                baseball_softball_event.athlete_id
+
+                FROM baseball_softball_event
+                INNER JOIN event ON event.id = baseball_softball_event.event_id
+                INNER JOIN team on team.id = event.team_id
+                WHERE athlete_id = %s and team.season_year >= %s and
+                (baseball_softball_event.is_invalid = false or baseball_softball_event.is_invalid is null)
+                GROUP BY baseball_softball_Event.athlete_id)
+                select 
+                at_bats,runs,hits,runs_batted_in,base_on_balls,strikeouts,left_on_base,
+                athlete_id, first_name, middle_name, last_names, number, profile_image_link
+                from aggregate_query
+                INNER JOIN athlete on athlete.id = aggregate_query.athlete_id
+                ;
+                """
+        cursor.execute(query, (int(aID), int(seasonYear),))
+        result = cursor.fetchone()
+        return result
+
     # NEW
     def getAllAggregatedAthleteStatisticsPerSeason(self, sID, seasonYear):
         """

@@ -7,6 +7,7 @@ import datetime
 import os
 import re
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -25,7 +26,7 @@ def rulesMatch(password):
 
     Args:
         password: password to be checked againt the regex.
-    
+
     Returns:
         A an object or None to determine if the password complies or not.
     """
@@ -42,7 +43,8 @@ def rulesMatch(password):
     # Return true if it matches false if it does not.
     if match:
         return True
-    return False  
+    return False
+
 
 # Uses BCrypt hashing algorithm to hash a password given with
 # the amount of rounds specified in the gensalt() method
@@ -86,6 +88,7 @@ def verifyHash(password, storedHash):
         return False
     return bcrypt.checkpw(password.encode('utf-8'), storedHash.encode('utf-8'))
 
+
 ###################################
 ### JWT Token Related Functions ###
 ###################################
@@ -107,11 +110,11 @@ def generateToken(username, permissions):
     # Create a JWT token
     payload = {
         'user': username,
-        'permissions':permissions,
-        'exp': datetime.datetime.utcnow()+datetime.timedelta(hours=3),
+        'permissions': permissions,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=3),
         'iat': datetime.datetime.utcnow()
     }
-    token = jwt.encode(payload, 'lol', algorithm='HS256')
+    token = jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm='HS256')
     return f'Bearer {token.decode("UTF-8")}'
 
 
@@ -130,10 +133,11 @@ def verifyToken(token):
         A boolean value signifying if the token is valid or not.
     """
     try:
-        jwt.decode(token, 'lol', algorithm='HS256')
+        jwt.decode(token, os.getenv('SECRET_KEY'), algorithm='HS256')
         return True
     except:
         return False
+
 
 # Verifies a token with the key given.
 def getTokenInfo(token):
@@ -150,6 +154,6 @@ def getTokenInfo(token):
         A boolean value signifying if the token is valid or not.
     """
     try:
-        return jwt.decode(token, 'lol', algorithm='HS256')
+        return jwt.decode(token, os.getenv('SECRET_KEY'), algorithm='HS256')
     except:
         return 'Token can\'t be retrieved.'

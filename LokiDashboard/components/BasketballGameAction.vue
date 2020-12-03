@@ -55,20 +55,7 @@
               ></v-select>
             </v-col>
           </v-row>
-          <v-row justify="center">
-            <v-col cols="12" sm="4">
-              <v-card-title class="body-1" style="word-break: normal;">Equipo de Interés</v-card-title>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="current_team"
-                :items="teams"
-                menu-props="auto"
-                label="Equipo *"
-                outlined
-              ></v-select>
-            </v-col>
-          </v-row>
+         
           <v-row justify="center">
             <v-col cols="12" sm="4">
               <v-card-title class="body-1" style="word-break: normal;">Selccione Atleta</v-card-title>
@@ -126,6 +113,26 @@
             text
             @click="deleteGameAction()"
           >Sí</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="time_dialog" persistent max-width="500">
+      <v-card>
+        <v-card-title class="text-center" style="word-break: normal;">Configuracion del tiempo</v-card-title>
+        <v-card-text>Por favor configure el tiempo de la jugada.</v-card-text>
+        <v-container max-width="200">
+          <v-text-field v-model="foo1" min=0 max=9 type="number" label="Minutos" placeholder="09"  :rules="time_rules"></v-text-field>
+          <v-text-field v-model="foo2" min=0 max=59 type="number" label="Segundos"  placeholder="00" :rules="time_rulesseg" ></v-text-field>
+        </v-container>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="gray darken-3" text @click="time_dialog = false">cerrar</v-btn>
+          <v-btn
+            color="green darken-1"
+            :loading="button_loading"
+            text
+            @click.native="setTime(foo1,foo2)"
+          >Guardar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -188,13 +195,17 @@
                 <span>Eliminar notificación</span>
               </v-tooltip>
             </v-row>
+            
+            
           </v-col>
         </v-row>
       </v-card>
       <v-card v-else width="550px" :elevation="hover ? 16 : 2">
         <v-toolbar :color="in_color" dark flat>
-          <v-row justify="center" align="center">
-            <v-card-title>{{ game_actions_map[action_type] }}</v-card-title>
+          <v-row>
+            <v-card-title align='left' class="mr-12 ml-12">{{time}}</v-card-title>
+            <v-card-title justify='center' align='center' class="ml-12">{{game_actions_map[action_type] }}</v-card-title>
+            
           </v-row>
         </v-toolbar>
         <v-row>
@@ -243,6 +254,25 @@
                 <template v-slot:activator="{ on }">
                   <v-btn
                     class="ma-2"
+                    color="grey"
+                    fab
+                    small
+                    dark
+                    @click.native="time_dialog = true"
+                    v-on="on"
+                    v-if="$store.state.userAuth.userPermissions[4]['17']"
+                  >
+                    <v-icon>mdi-clock</v-icon>
+                  </v-btn>
+                </template>
+                <span>Configurar el tiempo</span>
+              </v-tooltip>
+            </v-row>
+            <v-row>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    class="ma-2"
                     color="red"
                     fab
                     small
@@ -257,6 +287,7 @@
                 <span>Eliminar jugada</span>
               </v-tooltip>
             </v-row>
+
           </v-col>
         </v-row>
       </v-card>
@@ -280,19 +311,27 @@ export default {
     event_id: Number,
     uprmAthletes: [],
     oppAthletes: [],
-    team: String
+    team: String,
+    time: String,
+    
+
+
   },
   data: () => ({
     // Notification keyword.
     notification: "Notification",
+    settimes: "Time",
 
     // Dialog flags.
     notification_dialog: false,
     delete_dialog: false,
+    time_dialog: false,
     edit_play_dialog: false,
 
     valid: false,
     button_loading: false,
+    minutos: '',
+    segundos: '',
 
     // Content to be displayed in the Edit Game Action dialog.
     teams: ["Oponente", "UPRM"],
@@ -302,12 +341,14 @@ export default {
       UPRM: "uprm"
     },
 
+    
+
     plays: [
-      "Tiro Libre",
-      "Tiro de Campo",
-      "Tiro de tres",
+      "Tiro Libre Anotado",
+      "Tiro de Campo Anotado",
+      "Tiro de tres Anotado",
       "Asistencia",
-      "Robo de balon",
+      "Robo",
       "Tapón",
       "Rebote",
       "Perdida de balón",
@@ -321,18 +362,20 @@ export default {
     game_actions_map: {
       Notification: "Notificación",
       Notificación: "Notification",
-      Freethrow: "Tiro Libre",
-      "Tiro Libre": "freethrow",
+      Freethrow: "Tiro Libre Anotado",
+      "Tiro Libre Anotado": "Freethrow",
       '2Points': "Tiro de Campo Anotado",
-      "Tiro de Campo": "2Points",
-      '3Points': "Tiro de Tres",
-      "Tiro de tres": "threepoints",
+      "Tiro de Campo Anotado": "2Points",
+      '3Points': "Tiro de Tres Anotado",
+      "Tiro de tres Anotado": "3Points",
       Assist: "Asistencia",
       Asistencia: "Assist",
-      Bloqueo: "Blocks",
+      Tapón: "Blocks",
       Blocks: "Tapón",
       Steals: "Robo",
+      "Robo": "Steals",
       Rebound: "Rebote",
+      "Rebote": "Rebound",
       Turnover: "Perdida de balón",
       "Perdida de balón": "Turnover",
       Foul: "Falta",
@@ -345,6 +388,16 @@ export default {
       v =>
         (v.length > 0 && v.length <= 100) ||
         "Las notificaciones deben tener entre 1 y 100 caracteres."
+    ],
+    time_rules: [
+      v =>
+        (v>= 0 && v <= 9) ||
+        "Los minutos deben ser entre 0 y 9."
+    ],
+    time_rulesseg: [
+      v =>
+        (v>= 0 && v <60) ||
+        "Los segundos deben ser entre 0 y 59."
     ]
   }),
   methods: {
@@ -392,6 +445,34 @@ export default {
         this.delete_dialog = false;
       }
       this.button_loading = false;
+    },
+
+    
+
+    async setTime(min,seg) {
+    if(min!=NaN && seg!=NaN){
+      this.minutos=parseInt(min,10);
+      this.segundos=parseInt(seg,10);
+    if ((this.minutos >= 0 && this.minutos <= 9)&&(this.segundos >= 0 && this.segundos < 60)) {
+      if(this.segundos<10){
+        this.segundos='0'+this.segundos;
+      }
+      const payload = {
+          event_id: this.event_id,
+          action_id: this.id,
+          data: {
+            action_type: this.settimes,
+            time: this.minutos+':'+this.segundos
+          }
+      };
+      this.button_loading = true;
+        if (await this.updateGameAction(payload)) {
+          this.time_dialog = false;;
+        }
+      this.button_loading = false;
+      
+    }
+    }
     },
 
     startEditPlay() {
@@ -475,7 +556,8 @@ export default {
         data: {
           action_type: this.game_actions_map[this.current_play],
           athlete_id: this.current_athlete,
-          team: this.team_map[this.current_team]
+          team: this.team_map[this.current_team],
+          time:this.time
         }
       };
       // Close edit play dialog if request is successful.
@@ -517,7 +599,6 @@ export default {
 
         case "Foul":
           return "Falta";
-
 
         default:
           return "Acción Desconocida";
@@ -580,7 +661,6 @@ export default {
     getRoster: function() {
       // UPRM selected.
       if (this.current_team === "UPRM") {
-        console.log(this.uprmAthletes);
         return this.uprmAthletes;
       }
       // Opponent selected.

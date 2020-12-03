@@ -315,7 +315,49 @@ class MatchBasedEventDAO:
         result = cursor.fetchone()
         return result
 
-    
+    def getAggregatedAthleteStatisticsCareer(self, aID, seasonYear):
+        """
+        Gets the aggregated statistics for a given athlete and season.
+
+        This function uses and ID and a year number to perform a query to the database
+        that gets the aggregated statistics in the system that match the given ID and season year.
+
+        Args:
+            aID: The ID of the athlete of which statistics need to be fetched.
+            seasonYear: the season year of which statistics need to be fetched.
+
+
+        Returns:
+            A list containing the response to the database query
+            containing the aggregated statistics in the system containing
+            the matching record for the given ID and season year.
+        """
+        cursor = self.conn.cursor()
+
+        query = """
+                   with aggregate_query as(
+                   SELECT
+                   sum(matches_played) as matches_played,sum(matches_won) as matches_won,
+                   match_based_event.athlete_id,match_based_event.category_id
+
+                   FROM match_based_event
+                   INNER JOIN event ON event.id = match_based_event.event_id
+                   INNER JOIN team on team.id = event.team_id
+                   WHERE athlete_id = %s and team.season_year >= %s and
+                   (match_based_event.is_invalid = false or match_based_event.is_invalid is null)                
+                   GROUP BY match_based_event.athlete_id,match_based_event.category_id)
+                   select 
+                   matches_played, matches_won,C.name,
+                   athlete_id, first_name, middle_name, last_names, number, profile_image_link
+                   from aggregate_query
+                   INNER JOIN athlete on athlete.id = aggregate_query.athlete_id
+                   INNER JOIN category as C on aggregate_query.category_id = C.id
+                   ;
+                   """
+        cursor.execute(query, (aID, seasonYear,))
+        result = cursor.fetchone()
+        return result
+
     def getAllAggregatedAthleteStatisticsPerSeason(self,sID,seasonYear):
         """
         Gets all the aggregated statistics for a given athlete and season. 

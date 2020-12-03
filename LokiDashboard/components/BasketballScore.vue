@@ -1,6 +1,9 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row justify="center">
+    <h1>MARCADOR</h1>
+    </v-row>
+    <v-row >
       <v-col>
         <v-row justify="center">
           <h1 class="text-lg-center">{{ uprm_team }}</h1>
@@ -28,7 +31,7 @@
           </v-layout>
           <v-col>
             <v-card class="ma-3 pa-6" outlined tile>
-              <h1 class="text-lg-center">{{ current_uprm_score[current_set-1] }}</h1>
+              <h1 class="text-lg-center">{{ uprmFinal }}</h1>
             </v-card>
           </v-col>
           <v-layout row wrap align-center>
@@ -55,14 +58,8 @@
       </v-col>
       <v-col>
         <v-row justify="center">
-          <h2 class="text-md-center">MARCADOR</h2>
         </v-row>
-        <v-row justify="center">
-          <v-card class="ma-3 pa-6" outlined tile>
-            <h1 class="text-md-center">{{ current_uprm_score[0]+current_uprm_score[1]+current_uprm_score[2]+current_uprm_score[3] }} - {{ current_opp_score[0]+current_opp_score[1]+current_opp_score[2]+current_opp_score[3] }}</h1>
-          </v-card>
-        </v-row>
-        <v-row justify="center">
+         <v-row justify="center">
           <h2 class="text-md-center">PARCIAL</h2>
         </v-row>
         <v-row justify="center">
@@ -110,6 +107,9 @@
             </v-col>
           </v-layout>
         </v-row>
+        <v-row justify="center">
+         </v-row>
+       
       </v-col>
       <v-col>
         <v-row justify="center">
@@ -138,7 +138,7 @@
           </v-layout>
           <v-col>
             <v-card class="ma-3 pa-6" outlined tile>
-              <h1 class="text-lg-center">{{ current_opp_score[current_set-1] }}</h1>
+              <h1 class="text-lg-center">{{ oppFinal }}</h1>
             </v-card>
           </v-col>
           <v-layout row wrap align-center>
@@ -179,7 +179,9 @@ export default {
     current_set: Number,
     current_uprm_score: Number, // Score of the current set for UPRM team.
     current_opp_score: Number, // Score of the current set for opponent team.
-    event_id: String
+    event_id: String,
+    uprmFinal:Number,
+    oppFinal:Number,
   },
   data: () => ({
     uprm: "uprm",
@@ -190,6 +192,8 @@ export default {
       sendSetAdjustAction: "BasketballPBP/sendSetAdjust",
       sendScoreAdjust: "BasketballPBP/sendGameAction"
     }),
+
+    
 
     sendAdjust(team_name, adjust_no) {
       let payload = {
@@ -213,3 +217,6 @@ export default {
   }
 };
 </script>
+<style>
+
+</style>

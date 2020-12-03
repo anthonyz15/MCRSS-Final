@@ -17,12 +17,16 @@ from handler.volleyball_event import VolleyballEventHandler
 from handler.soccer_event import SoccerEventHandler
 from handler.baseball_event import BaseballEventHandler
 from handler.sport import SportHandler
-from handler.voleyball_pbp_handler import VolleyballPBPHandler
+from handler.pbp_handler import VolleyballPBPHandler
 from handler.basketball_pbp_handler import BasketballPBPHandler
+from handler.soccer_pbp_handler import SoccerPBPHandler
+from handler.baseball_pbp_handler import BaseballPBPHandler
 from handler.match_based_event import MatchBasedEventHandler
 from handler.team import TeamHandler
 from handler.event_result import EventResultHandler
 from handler.medal_based_event import MedalBasedEventHandler
+from handler.multimedia import MultimediaHandler
+from handler.about_us import AboutUsHandler
 
 
 # Load environment variables
@@ -88,6 +92,168 @@ def validateRequestPermissions(token, permissionNumber):
         }[permissionNumber]
     index = switch(permissionNumber)
     return(token['permissions'][index][permissionNumber])
+
+#--------- Multimedia Routes ---------#
+
+@app.route("/multimedia", methods=['POST'])
+@token_check
+def addMultimedia():
+    #Check if dashboard user making the request has a valid session.
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
+    
+    if request.method == 'POST':
+        #Verify request json is structured correctly
+        json = request.get_json(silent=True)
+        if not json:
+            return jsonify(Error = "Argumentos dados no estan estructurados correctamente."), 400
+        if not 'attributes' in json:
+            return jsonify(Error = "Argumentos dados no estan estructurados correctamente."), 400
+        handler = MultimediaHandler()
+        return handler.addMultimedia(json['attributes'])
+
+@app.route("/multimedia", methods=['GET'])
+def getAllMultimedia():
+    if request.method == 'GET':
+        handler = MultimediaHandler()
+        return handler.getAllMultimedia()
+
+@app.route("/multimedia/<int:mid>", methods=['GET'])
+def getMultimediaByID(mid):
+    if request.method == 'GET':
+        handler = MultimediaHandler()
+        return handler.getMultimediaByID(mid)
+
+@app.route("/multimedia/<mType>", methods=['GET'])
+def getMultimediaByType(mType):
+    if request.method == 'GET':
+        handler = MultimediaHandler()
+        return handler.getMultimediaByType(mType)
+
+@app.route("/multimedia/author/<int:duid>", methods=['GET'])
+@token_check
+def getMultimediaByAuthor(duid):
+    #Check if dashboard user making the request has a valid session.
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
+    
+    if request.method == 'GET':
+        handler = MultimediaHandler()
+        return handler.getMultimediaByAuthor(duid)
+
+@app.route("/multimedia/<int:mid>", methods=['PUT'])
+@token_check
+def editMultimedia(mid):
+    #Check if dashboard user making the request has a valid session.
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
+    
+    if request.method == 'PUT':
+        #Verify request json is structured correctly
+        json = request.get_json(silent=True)
+        if not json:
+            return jsonify(Error = "Argumentos dados no estan estructurados correctamente."), 400
+        if not 'attributes' in json:
+            return jsonify(Error = "Argumentos dados no estan estructurados correctamente."), 400
+        handler = MultimediaHandler()
+        return handler.editMultimedia(mid, json['attributes'])
+
+@app.route("/multimedia/<int:mid>", methods=['DELETE'])
+@token_check
+def removeMultimedia(mid):
+    #Check if dashboard user making the request has a valid session.
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
+    
+    if request.method == 'DELETE':
+        handler = MultimediaHandler()
+        return handler.removeMultimedia(mid)
+
+
+# --------- AboutUs Routes ---------#
+
+@app.route("/aboutus", methods=['POST'])
+# @token_check
+def addAboutUs():
+    # Check if dashboard user making the request has a valid session.
+    # token = extractUserInfoFormToken()
+    # loggedUser = customSession.isLoggedIn(token['user'])
+    # if(loggedUser == None):
+    #     return jsonify(Error='No hay una sesión valida.'), 401
+
+    if request.method == 'POST':
+        # Verify request json is structured correctly
+        json = request.get_json(silent=True)
+        if not json:
+            return jsonify(Error="Argumentos dados no estan estructurados correctamente."), 400
+        if not 'attributes' in json:
+            return jsonify(Error="Argumentos dados no estan estructurados correctamente."), 400
+        handler = AboutUsHandler()
+        return handler.addAboutUs(json['attributes'])
+
+
+@app.route("/aboutus", methods=['GET'])
+def getAllAboutUs():
+    if request.method == 'GET':
+        handler = AboutUsHandler()
+        return handler.getAllAboutUs()
+
+
+@app.route("/aboutus/<int:hdid>", methods=['GET'])
+def getAboutUsByID(hdid):
+    if request.method == 'GET':
+        handler = AboutUsHandler()
+        return handler.getAboutUsByID(hdid)
+
+
+@app.route("/aboutus/<hType>", methods=['GET'])
+def getAboutUsByType(hType):
+    if request.method == 'GET':
+        handler = AboutUsHandler()
+        return handler.getAboutUsByType(hType)
+
+
+@app.route("/aboutus/<int:hdid>", methods=['PUT'])
+# @token_check
+def editAboutUs(hdid):
+    # Check if dashboard user making the request has a valid session.
+    # token = extractUserInfoFormToken()
+    # loggedUser = customSession.isLoggedIn(token['user'])
+    # if(loggedUser == None):
+    #     return jsonify(Error='No hay una sesión valida.'), 401
+
+    if request.method == 'PUT':
+        # Verify request json is structured correctly
+        json = request.get_json(silent=True)
+        if not json:
+            return jsonify(Error="Argumentos dados no estan estructurados correctamente."), 400
+        if not 'attributes' in json:
+            return jsonify(Error="Argumentos dados no estan estructurados correctamente."), 400
+        handler = AboutUsHandler()
+        return handler.editAboutUs(hdid, json['attributes'])
+
+
+@app.route("/aboutus/<int:hdid>", methods=['DELETE'])
+# @token_check
+def removeAboutUs(hdid):
+    # Check if dashboard user making the request has a valid session.
+    # token = extractUserInfoFormToken()
+    # loggedUser = customSession.isLoggedIn(token['user'])
+    # if(loggedUser == None):
+    #     return jsonify(Error='No hay una sesión valida.'), 401
+
+    if request.method == 'DELETE':
+        handler = AboutUsHandler()
+        return handler.removeAboutUs(hdid)
+
 
 #--------- Athlete Routes ---------#
 @app.route("/athletes/public/", methods=['GET'])
@@ -554,9 +720,9 @@ def teamEvents(tID):
 def basketballStatistics():
     # Check user making the reques has a valid session.
     token = extractUserInfoFormToken()
-    loggedUser = customSession.isLoggedIn(token['user'])
-    if(loggedUser == None):
-        return jsonify(Error='No hay una sesión valida.'), 401
+    #loggedUser = customSession.isLoggedIn(token['user'])
+    #if(loggedUser == None):
+     #   return jsonify(Error='No hay una sesión valida.'), 401
     json = request.json
     if json is None:
         return jsonify(Error='Solicitud Incorrecta'), 400
@@ -905,12 +1071,19 @@ def basketballAggregateAthleteStatistics():
     handler = BasketballEventHandler()
     if request.method == 'GET':
         # Validate GET requests
-        if ('athlete_id' not in json or 'season_year' not in json):
+        if ('athlete_id' in json and 'season_year' in json):
+            season_year = request.args.get('season_year', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+        elif ('athlete_id' in json and 'season_start' in json):
+            season_start = request.args.get('season_start', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+        else:
             return jsonify(Error='Solicitud Incorrecta'), 400
-        season_year = request.args.get('season_year', type=int)
-        athlete_id = request.args.get('athlete_id', type=int)
-        # Carry on with request
-        return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+
     else:
         return jsonify(Error="Metodo no Permitido."), 405
 
@@ -996,6 +1169,10 @@ def pbp_sequence(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
          
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
@@ -1055,6 +1232,10 @@ def volleyball_pbp_set_current_set(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
 
@@ -1092,6 +1273,10 @@ def pbp_set_color(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
 
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
@@ -1124,6 +1309,10 @@ def pbp_roster(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
 
@@ -1251,6 +1440,10 @@ def pbp_actions(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
 
@@ -1309,6 +1502,10 @@ def pbp_end(sport):
         handler = VolleyballPBPHandler()
     elif sport=="Baloncesto":
          handler = BasketballPBPHandler()
+    elif sport == "Futbol":
+        handler = SoccerPBPHandler()
+    elif sport == "Beisbol" or sport == "Softbol" :
+        handler = BaseballPBPHandler()
     else:
         return jsonify(Error="El deporte seleccionado no tiene cobertura jugada a jugada."), 400
 
@@ -1733,12 +1930,18 @@ def volleyballAggregateAthleteStatistics():
     handler = VolleyballEventHandler()
     if request.method == 'GET':
         # Validate GET requests
-        if ('athlete_id' not in json or 'season_year' not in json):
+        if ('athlete_id' in json and 'season_year' in json):
+            season_year = request.args.get('season_year', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+        elif ('athlete_id' in json and 'season_start' in json):
+            season_start = request.args.get('season_start', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+        else:
             return jsonify(Error='Solicitud Incorrecta'), 400
-        season_year = request.args.get('season_year', type=int)
-        athlete_id = request.args.get('athlete_id', type=int)
-        # Carry on with request
-        return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
     else:
         return jsonify(Error="Metodo no permitido."), 405
 
@@ -1856,9 +2059,9 @@ def volleyballAggregateTeamStatistics():
 def soccerStatistics():
     # Check user making the reques has a valid session.
     token = extractUserInfoFormToken()
-    loggedUser = customSession.isLoggedIn(token['user'])
-    if(loggedUser == None):
-        return jsonify(Error='No hay una sesión valida.'), 401
+    #loggedUser = customSession.isLoggedIn(token['user'])
+    #if(loggedUser == None):
+    #    return jsonify(Error='No hay una sesión valida.'), 401
     json = request.json
     if json is None:
         return jsonify(Error='Solicitud Incorrecta'), 400
@@ -2195,12 +2398,18 @@ def soccerAggregateAthleteStatistics():
     handler = SoccerEventHandler()
     if request.method == 'GET':
         # Validate GET requests
-        if ('athlete_id' not in json or 'season_year' not in json):
+        if ('athlete_id' in json and 'season_year' in json):
+            season_year = request.args.get('season_year', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+        elif ('athlete_id' in json and 'season_start' in json):
+            season_start = request.args.get('season_start', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+        else:
             return jsonify(Error='Solicitud Incorrecta'), 400
-        season_year = request.args.get('season_year', type=int)
-        athlete_id = request.args.get('athlete_id', type=int)
-        # Carry on with request
-        return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
     else:
         return jsonify(Error="Metodo no permitido."), 405
 
@@ -2322,9 +2531,9 @@ def soccerAggregateTeamStatistics():
 def baseballStatistics():
     # Check user making the reques has a valid session.
     token = extractUserInfoFormToken()
-    loggedUser = customSession.isLoggedIn(token['user'])
-    if(loggedUser == None):
-        return jsonify(Error='No hay una sesión valida.'), 401
+    # loggedUser = customSession.isLoggedIn(token['user'])
+    # if(loggedUser == None):
+    #     return jsonify(Error='No hay una sesión valida.'), 401
     json = request.json
     if json is None:
         return jsonify(Error='Solicitud Incorrecta'), 400
@@ -2667,12 +2876,18 @@ def baseballAggregateAthleteStatistics():
     handler = BaseballEventHandler()
     if request.method == 'GET':
         # Validate GET requests
-        if ('athlete_id' not in json or 'season_year' not in json):
+        if ('athlete_id' in json and 'season_year' in json):
+            season_year = request.args.get('season_year', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+        elif ('athlete_id' in json and 'season_start' in json):
+            season_start = request.args.get('season_start', type=int)
+            athlete_id = request.args.get('athlete_id', type=int)
+            # Carry on with request
+            return handler.getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+        else:
             return jsonify(Error='Solicitud Incorrecta'), 400
-        season_year = request.args.get('season_year', type=int)
-        athlete_id = request.args.get('athlete_id', type=int)
-        # Carry on with request
-        return handler.getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
     else:
         return jsonify(Error="Metodo no permitido."), 405
 
@@ -3267,7 +3482,18 @@ def matchbasedAggregateAthleteStatistics():
 
     if request.method == 'GET':
         try:
-            return MatchBasedEventHandler().getAggregatedAthleteStatisticsPerSeason(int(json['athlete_id']), int(json['season_year']))
+            if ('athlete_id' in json and 'season_year' in json):
+                season_year = request.args.get('season_year', type=int)
+                athlete_id = request.args.get('athlete_id', type=int)
+                # Carry on with request
+                return MatchBasedEventHandler().getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+            elif ('athlete_id' in json and 'season_start' in json):
+                season_start = request.args.get('season_start', type=int)
+                athlete_id = request.args.get('athlete_id', type=int)
+                # Carry on with request
+                return MatchBasedEventHandler().getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+            else:
+                return jsonify(Error='Solicitud Incorrecta'), 400
         except:
             return jsonify(Error="Argumentos incorrectos fueron dados."), 400
 
@@ -3567,7 +3793,18 @@ def medalbasedAggregateAthleteStatistics():
 
     if request.method == 'GET':
         try:
-            return MedalBasedEventHandler().getAggregatedAthleteStatisticsPerSeason(int(json['athlete_id']), int(json['season_year']))
+            if ('athlete_id' in json and 'season_year' in json):
+                season_year = request.args.get('season_year', type=int)
+                athlete_id = request.args.get('athlete_id', type=int)
+                # Carry on with request
+                return MedalBasedEventHandler().getAggregatedAthleteStatisticsPerSeason(athlete_id, season_year)
+            elif ('athlete_id' in json and 'season_start' in json):
+                season_start = request.args.get('season_start', type=int)
+                athlete_id = request.args.get('athlete_id', type=int)
+                # Carry on with request
+                return MedalBasedEventHandler().getAggregatedAthleteStatisticsCareer(athlete_id, season_start)
+            else:
+                return jsonify(Error='Solicitud Incorrecta'), 400
         except:
             return jsonify(Error="Argumentos incorrectos fueron dados."), 400
 

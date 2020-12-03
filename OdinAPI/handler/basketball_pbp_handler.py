@@ -11,7 +11,7 @@ class BasketballPBPHandler:
                  by interacting with the PBPDAO. It is responsible for modifying
                  the state of content stored in the non-relational database,
                  especially information regarding Basketball PBP sequences.
-    @author Pedro Luis Rivera Gomez
+    @author Anthony Cuevas Rodriguez
     '''
 
     def __init__(self):
@@ -21,26 +21,29 @@ class BasketballPBPHandler:
 
         self._sport_keywords = {
             "score-val": {
-                "set1-opponent": 0,
-                "set1-uprm": 0,
-                "set2-opponent": 0,
-                "set2-uprm": 0,
-                "set3-opponent": 0,
-                "set3-uprm": 0,
-                "set4-opponent": 0,
-                "set4-uprm": 0,
+                "quater1-opponent": 0,
+                "quater1-uprm": 0,
+                "quater2-opponent": 0,
+                "quater2-uprm": 0,
+                "quater3-opponent": 0,
+                "quater3-uprm": 0,
+                "quater4-opponent": 0,
+                "quater4-uprm": 0,
             },
-            "uprm-sets": ["/set1-uprm", "/set2-uprm", "/set3-uprm", "/set4-uprm", "/set5-uprm"],
-            "opp-sets": ["/set1-opponent", "/set2-opponent", "/set3-opponent", "/set4-opponent", "/set5-opponent"],
+            "uprm-sets": ["/quater1-uprm", "/quater2-uprm", "/quater3-uprm", "/quater4-uprm"],
+            "opp-sets": ["/quater1-opponent", "/quater2-opponent", "/quater3-opponent", "/quater4-opponent"],
             "sport": "Baloncesto",
             "Freethrow_actions": [
-                "Freethrow"
+                "Freethrow",
+                "FreethrowMiss"
             ],
             "2Points_actions": [
-                "2Points"
+                "2Points",
+                "2PointsMiss"
             ],
             "3Points_actions": [
-                "3Points"
+                "3Points",
+                "3PointsMiss"
             ],
             "personal_actions": [
                 "Assist",
@@ -53,7 +56,6 @@ class BasketballPBPHandler:
             "adjust": "ScoreAdjust",
             "notification": "Notification",
             "teams": ["uprm", "opponent"],
-            # Color format regex adapted from: https://www.regextester.com/93589
             "color-format": "^((0x){0,1}|#{0,1})([0-9A-F]{8}|[0-9A-F]{6})$",
             "athlete_prefix": "athlete-"
         }
@@ -62,19 +64,24 @@ class BasketballPBPHandler:
         """
         Internal method to determine set path directly depending on the action team.
         """
-
         # Validate team value is specified correctly.
         if team not in self._sport_keywords["teams"]:
             raise Exception("Nombre de equipo es inválido.")
 
         current_set = int(dao.get_current_set(event_id))
         set_path = ""
-
         # Determine proper set path value based on the team that needs the adjust.
-        if team == self._sport_keywords["teams"][0]:
-            set_path = self._sport_keywords["uprm-sets"][current_set - 1]
-        else:
-            set_path = self._sport_keywords["opp-sets"][current_set - 1]
+        if current_set<4:
+            if team == self._sport_keywords["teams"][0]:
+                set_path = self._sport_keywords["uprm-sets"][current_set - 1]
+            else:
+                set_path = self._sport_keywords["opp-sets"][current_set - 1]
+        else :
+            if team == self._sport_keywords["teams"][0]:
+                set_path = "/quater"+str(current_set)+"-uprm"
+            else:
+                set_path = "/quater"+str(current_set)+"-opponent"
+
 
         return set_path
 
@@ -91,10 +98,16 @@ class BasketballPBPHandler:
         set_path = ""
 
         # Determine proper set path value based on the team value (returns the opposite team set path).
-        if team == self._sport_keywords["teams"][0]:
-            set_path = self._sport_keywords["opp-sets"][current_set - 1]
+        if current_set < 4:
+            if team == self._sport_keywords["teams"][0]:
+                set_path = self._sport_keywords["opp-sets"][current_set - 1]
+            else:
+                set_path = self._sport_keywords["uprm-sets"][current_set - 1]
         else:
-            set_path = self._sport_keywords["uprm-sets"][current_set - 1]
+            if team == self._sport_keywords["teams"][0]:
+                set_path = "/quater" + str(current_set) + "-opponent"
+            else:
+                set_path = "/quater" + str(current_set) + "-uprm"
 
         return set_path
 
@@ -108,13 +121,13 @@ class BasketballPBPHandler:
             raise Exception(
                 "Información de la acción (data) debe proveerse en formato JSONs.")
 
-        if len(action) < 2 or len(action) > 3:
+        if len(action) < 2 or len(action) > 4:
             raise Exception(
                 "Información de la acción (data) debe tener 2 parámetros para una notificación y 3 para una acción de jugada.")
 
         if not "action_type" in action:
             raise Exception(
-                "La jugada enviada no está cubierta por el PBP de Voleibol.")
+                "La jugada enviada no está cubierta por el PBP de Baloncesto.")
 
         action_type = action["action_type"]
 
@@ -139,9 +152,9 @@ class BasketballPBPHandler:
             return
 
         # At this point, the remaining valid actions must have 3 arguments.
-        if len(action) != 3:
+        if len(action) != 4:
             raise Exception(
-                "El número de argumentos esperado es 3.")
+                "El número de argumentos esperado es 4.")
 
         # Adjust game actions modify the score of the direct team indicated in action["team"].
         # These are not added to the notifications feed (non-relational database).
@@ -182,25 +195,30 @@ class BasketballPBPHandler:
         is_valid_athlete = (self._sport_keywords["athlete_prefix"] + str(action["athlete_id"]) in dao.get_uprm_roster(event_id)
                             or (self._sport_keywords["athlete_prefix"] + str(action["athlete_id"])) in dao.get_opponent_roster(event_id))
         print(is_valid_athlete)
+
         # Scoring game actions modify athlete statistics and team score.
         if action_type in self._sport_keywords["Freethrow_actions"]:
-
             if is_valid_athlete:
+
                 set_path = self._get_direct_set_path(
                     action["team"], event_id, dao)
-
-                dao.add_scoring_pbp_game_action(event_id, action, set_path, 1)
+                if action_type == self._sport_keywords["Freethrow_actions"][1]:
+                    dao.add_pbp_game_action(event_id, action)
+                else:
+                    dao.add_scoring_pbp_game_action(event_id, action, set_path, 1)
                 return
 
             else:
                 raise Exception("Información del atleta es inválida.")
-        if action_type in self._sport_keywords["2Points_actions"]:
 
+        if action_type in self._sport_keywords["2Points_actions"]:
             if is_valid_athlete:
                 set_path = self._get_direct_set_path(
                     action["team"], event_id, dao)
-
-                dao.add_scoring_pbp_game_action(event_id, action, set_path, 2)
+                if action_type == self._sport_keywords["2Points_actions"][1]:
+                    dao.add_pbp_game_action(event_id, action)
+                else:
+                    dao.add_scoring_pbp_game_action(event_id, action, set_path, 2)
                 return
 
             else:
@@ -211,8 +229,10 @@ class BasketballPBPHandler:
             if is_valid_athlete:
                 set_path = self._get_direct_set_path(
                     action["team"], event_id, dao)
-
-                dao.add_scoring_pbp_game_action(event_id, action, set_path, 3)
+                if action_type == self._sport_keywords["3Points_actions"][1]:
+                    dao.add_pbp_game_action(event_id, action)
+                else:
+                    dao.add_scoring_pbp_game_action(event_id, action, set_path, 3)
                 return
 
             else:
@@ -233,6 +253,19 @@ class BasketballPBPHandler:
         raise Exception(
             "La acción indicada no está cubierta por PBP de Baloncesto.")
 
+    def _handle_time(self, event_id, action_id, new_action, dao):
+
+        if not dao.pbp_game_action_exists(event_id, action_id):
+            raise Exception("No existe esta acción en el sistema.")
+
+        if len(new_action) < 2 or len(new_action) > 4:
+            raise Exception(
+                "La acción debe tener dos parámetros para notificación o 3 para cualquier otra acción.")
+
+        time=new_action['time']
+        dao.edit_pbp_time_game_action(event_id, action_id, time)
+        return
+
     def _handle_pbp_edit_action(self, event_id, action_id, new_action, dao):
         """
         Internal method for handling editting previously added game actions in a PBP sequence.
@@ -241,7 +274,7 @@ class BasketballPBPHandler:
         if not dao.pbp_game_action_exists(event_id, action_id):
             raise Exception("No existe esta acción en el sistema.")
 
-        if len(new_action) < 2 or len(new_action) > 3:
+        if len(new_action) < 2 or len(new_action) > 4:
             raise Exception(
                 "La acción debe tener dos parámetros para notificación o 3 para cualquier otra acción.")
 
@@ -259,9 +292,10 @@ class BasketballPBPHandler:
 
         # Variables to be used depending on the edit type.
         are_same_type = (
-            prev_type in self._sport_keywords["scoring_actions"] and new_type in self._sport_keywords["scoring_actions"]
+            prev_type in self._sport_keywords["2Points_actions"] and new_type in self._sport_keywords["2Points_actions"]
+            or prev_type in self._sport_keywords["3Points_actions"] and new_type in self._sport_keywords["3Points_actions"]
+            or prev_type in self._sport_keywords["Freethrow_actions"] and new_type in self._sport_keywords["Freethrow_actions"]
             or prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["personal_actions"]
-            or prev_type in self._sport_keywords["error_actions"] and new_type in self._sport_keywords["error_actions"]
             or prev_type == "Notification" and new_type == "Notification")
 
         # Notifications are only posted. No score or set value needs to be modified from a notification.
@@ -277,8 +311,8 @@ class BasketballPBPHandler:
             raise Exception(
                 "Las notificaciones no pueden cambiar de tipo.")
 
-        if len(new_action) != 3:
-            raise Exception("Las jugadas deben tener 3 parámetros.")
+        if len(new_action) != 4:
+            raise Exception("Las jugadas deben tener 4 parámetros.")
 
         # From now on, the remaining game actions involve game plays.
         # Plays require values for team and athlete_id.
@@ -303,14 +337,39 @@ class BasketballPBPHandler:
         if new_team == self._sport_keywords["teams"][1] and (self._sport_keywords["athlete_prefix"] + str(int(athlete_id))) not in dao.get_opponent_roster(event_id):
             raise Exception("Atleta oponente no está en el roster.")
 
-        # *** Case same type of play (scoring action), but a change is present. ***
-        if are_same_type and prev_type in self._sport_keywords["scoring_actions"]:
+        # *** Case same type of play (Freethrow_actions), but a change is present. ***
+        if are_same_type and prev_type in self._sport_keywords["Freethrow_actions"]:
             # Different team means we need to re-attribute the point to the proper team.
             if new_team != prev_action["team"]:
                 inc_path = self._get_direct_set_path(new_team, event_id, dao)
                 dec_path = self._get_indirect_set_path(new_team, event_id, dao)
-                dao.adjust_score_by_play_edit(
-                    event_id, dec_path, inc_path, 1, action_id, new_action)
+                dao.adjust_score_by_play_edit( event_id, dec_path, inc_path, 1, action_id, new_action)
+
+            # Update action.
+            else:
+                dao.edit_pbp_game_action(event_id, action_id, new_action)
+            return
+
+        # *** Case same type of play (2Points_actions), but a change is present. ***
+        if are_same_type and prev_type in self._sport_keywords["2Points_actions"]:
+            # Different team means we need to re-attribute the point to the proper team.
+            if new_team != prev_action["team"]:
+                inc_path = self._get_direct_set_path(new_team, event_id, dao)
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+                dao.adjust_score_by_play_edit(event_id, dec_path, inc_path, 2, action_id, new_action)
+
+            # Update action.
+            else:
+                dao.edit_pbp_game_action(event_id, action_id, new_action)
+            return
+
+        # *** Case same type of play (3Points_actions), but a change is present. ***
+        if are_same_type and prev_type in self._sport_keywords["3Points_actions"]:
+            # Different team means we need to re-attribute the point to the proper team.
+            if new_team != prev_action["team"]:
+                inc_path = self._get_direct_set_path(new_team, event_id, dao)
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+                dao.adjust_score_by_play_edit(event_id, dec_path, inc_path, 3, action_id, new_action)
 
             # Update action.
             else:
@@ -323,40 +382,73 @@ class BasketballPBPHandler:
             dao.edit_pbp_game_action(event_id, action_id, new_action)
             return
 
-        # *** Case same type of play (error action), but a change is present. ***
-        if are_same_type and prev_type in self._sport_keywords["error_actions"]:
-            # Different team means we need to re-attribute the point to the proper team.
-            if new_team != prev_action["team"]:
-                inc_path = self._get_indirect_set_path(new_team, event_id, dao)
-                dec_path = self._get_direct_set_path(new_team, event_id, dao)
-                dao.adjust_score_by_play_edit(
-                    event_id, dec_path, inc_path, 1, action_id, new_action)
 
-            # Update action.
-            else:
-                dao.edit_pbp_game_action(event_id, action_id, new_action)
-            return
 
         # At this point, cases in which same play type were considered.
         # The following cases represent when a different action type is found (except for notifications).
 
-        # *** Case previously considered scoring action, but changed into an error action. ***
-        if prev_type in self._sport_keywords["scoring_actions"] and new_type in self._sport_keywords["error_actions"]:
-            # If different action but same team, point must be attributed to the other team. Otherwise just update the action.
-            if new_team == prev_action["team"]:
-                dec_path = self._get_direct_set_path(new_team, event_id, dao)
-                inc_path = self._get_indirect_set_path(new_team, event_id, dao)
-                dao.adjust_score_by_play_edit(
-                    event_id, dec_path, inc_path, 1, action_id, new_action)
+
+        # *** Case previously considered freethrow action, but changed into a personal action. ***
+        if prev_type in self._sport_keywords["Freethrow_actions"] and new_type in self._sport_keywords["personal_actions"]:
+            # If different action but same team, score must decrease for current team. Otherwise just update the action.
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
 
             # Update action.
-            else:
-                dao.edit_pbp_game_action(event_id, action_id, new_action)
+            dao.adjust_score_by_play_edit_inc(event_id, dec_path, -1, action_id, new_action)
             return
 
         # *** Case previously considered scoring action, but changed into a personal action. ***
-        if prev_type in self._sport_keywords["scoring_actions"] and new_type in self._sport_keywords["personal_actions"]:
-            # If different action but same team, score must decrease for current team. Otherwise just update the action.
+        if prev_type in self._sport_keywords["2Points_actions"] and new_type in self._sport_keywords["personal_actions"]:
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, -2, action_id, new_action)
+            return
+
+        if prev_type in self._sport_keywords["3Points_actions"] and new_type in self._sport_keywords["personal_actions"]:
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, -3, action_id, new_action)
+            return
+            # *** Case previously considered scoring action, but changed into a personal action. ***
+        if prev_type in self._sport_keywords["2Points_actions"] and new_type in self._sport_keywords["Freethrow_actions"]:
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, -1, action_id, new_action)
+            return
+        if prev_type in self._sport_keywords["2Points_actions"] and new_type in self._sport_keywords["3Points_actions"]:
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, 1, action_id, new_action)
+            return
+
+        if prev_type in self._sport_keywords["3Points_actions"] and new_type in self._sport_keywords["Freethrow_actions"]:
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, -2, action_id, new_action)
+            return
+        if prev_type in self._sport_keywords["3Points_actions"] and new_type in self._sport_keywords["2Points_actions"]:
             dec_path = self._get_direct_set_path(new_team, event_id, dao)
             if new_team != prev_action["team"]:
                 dec_path = self._get_indirect_set_path(new_team, event_id, dao)
@@ -366,54 +458,56 @@ class BasketballPBPHandler:
                 event_id, dec_path, -1, action_id, new_action)
             return
 
-        # *** Case previously considered error action, but changed into a scoring action. ***
-        if prev_type in self._sport_keywords["error_actions"] and new_type in self._sport_keywords["scoring_actions"]:
-            # If different action but same team, point must be attributed to the other team. Otherwise just update the action.
-            if new_team == prev_action["team"]:
-                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
-                inc_path = self._get_direct_set_path(new_team, event_id, dao)
-                dao.adjust_score_by_play_edit(
-                    event_id, dec_path, inc_path, 1, action_id, new_action)
-
-            # Update action.
-            else:
-                dao.edit_pbp_game_action(event_id, action_id, new_action)
-            return
-
-        # *** Case previously considered error action, but changed into a personal action. ***
-        if prev_type in self._sport_keywords["error_actions"] and new_type in self._sport_keywords["personal_actions"]:
+        if prev_type in self._sport_keywords["Freethrow_actions"] and new_type in self._sport_keywords["3Points_actions"]:
             # If different action but same team, score must decrease for current team. Otherwise just update the action.
-            dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
             if new_team != prev_action["team"]:
-                dec_path = self._get_direct_set_path(new_team, event_id, dao)
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
 
             # Update action.
             dao.adjust_score_by_play_edit_inc(
-                event_id, dec_path, -1, action_id, new_action)
+                event_id, dec_path, 2, action_id, new_action)
+            return
+        if prev_type in self._sport_keywords["Freethrow_actions"] and new_type in self._sport_keywords["2Points_actions"]:
+            # If different action but same team, score must decrease for current team. Otherwise just update the action.
+            dec_path = self._get_direct_set_path(new_team, event_id, dao)
+            if new_team != prev_action["team"]:
+                dec_path = self._get_indirect_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(
+                event_id, dec_path, 1, action_id, new_action)
             return
 
-        # *** Case previously considered personal action, but changed into a scoring action. ***
-        if prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["scoring_actions"]:
+        # *** Case previously considered personal action, but changed into a Freethrow action. ***
+        if prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["Freethrow_actions"]:
             # Update action + increase a point to current team.
             inc_path = self._get_direct_set_path(new_team, event_id, dao)
 
             # Update action.
-            dao.adjust_score_by_play_edit_inc(
-                event_id, inc_path, 1, action_id, new_action)
+            dao.adjust_score_by_play_edit_inc(event_id, inc_path, 1, action_id, new_action)
             return
 
-        # *** Case previously considered personal action, but changed into a error action. ***
-        if prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["error_actions"]:
-            # Add a point to indirect team.
-            inc_path = self._get_indirect_set_path(new_team, event_id, dao)
+        # *** Case previously considered personal action, but changed into a 2points action. ***
+        if prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["2Points_actions"]:
+            # Update action + increase a point to current team.
+            inc_path = self._get_direct_set_path(new_team, event_id, dao)
 
             # Update action.
-            dao.adjust_score_by_play_edit_inc(
-                event_id, inc_path, 1, action_id, new_action)
+            dao.adjust_score_by_play_edit_inc(event_id, inc_path, 2, action_id, new_action)
             return
 
+        # *** Case previously considered personal action, but changed into a 3points action. ***
+        if prev_type in self._sport_keywords["personal_actions"] and new_type in self._sport_keywords["3Points_actions"]:
+            # Update action + increase a point to current team.
+            inc_path = self._get_direct_set_path(new_team, event_id, dao)
+
+            # Update action.
+            dao.adjust_score_by_play_edit_inc(event_id, inc_path, 3, action_id, new_action)
+            return
+        print(prev_type)
         raise Exception(
-            "La jugada enviada no está cubierta por el PBP de Voleibol.")
+            "La jugada enviada no está cubierta por el PBP de Baloncesto.")
 
     def _handle_remove_pbp_action(self, event_id, action_id, dao):
         """
@@ -426,14 +520,21 @@ class BasketballPBPHandler:
         action = dao.get_pbp_action(event_id, action_id)
 
         # If it is a scoring action, direct team score must decrease by 1.
-        if action["action_type"] in self._sport_keywords["scoring_actions"]:
+        if action["action_type"] in self._sport_keywords["Freethrow_actions"]:
             path = self._get_direct_set_path(action["team"], event_id, dao)
             dao.adjust_score_by_set(event_id, path, -1)
 
-        # If it is an error action, indirect score must decrease by 1.
-        elif action["action_type"] in self._sport_keywords["error_actions"]:
-            path = self._get_indirect_set_path(action["team"], event_id, dao)
-            dao.adjust_score_by_set(event_id, path, -1)
+        # If it is a scoring action, direct team score must decrease by 1.
+        if action["action_type"] in self._sport_keywords["2Points_actions"]:
+            path = self._get_direct_set_path(action["team"], event_id, dao)
+            dao.adjust_score_by_set(event_id, path, -2)
+
+        # If it is a scoring action, direct team score must decrease by 1.
+        if action["action_type"] in self._sport_keywords["3Points_actions"]:
+            path = self._get_direct_set_path(action["team"], event_id, dao)
+            dao.adjust_score_by_set(event_id, path, -3)
+
+
 
         dao.remove_pbp_game_action(event_id, action_id)
 
@@ -465,7 +566,7 @@ class BasketballPBPHandler:
             event_info = event_info.get("Event")
 
             if event_info.get("sport_name") != self._sport_keywords["sport"]:
-                return jsonify(Error="El evento seleccionado no es de Voleibol."), 403
+                return jsonify(Error="El evento seleccionado no es de Baloncesto."), 403
 
             pbp_dao = BasketballPBPDao()
             if pbp_dao.pbp_exists(event_id):
@@ -511,7 +612,7 @@ class BasketballPBPHandler:
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             pbp_dao.remove_pbp_seq(event_id)
             return jsonify(MSG="La secuencia PBP ha sido removida."), 200
@@ -543,17 +644,22 @@ class BasketballPBPHandler:
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ya ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ya ha finalizado."), 403
 
             current_set = pbp_dao.get_current_set(event_id)
+            if current_set>4 and adjust==-1:
+                return jsonify(Error="El partido se encuentra en tiempo extra."), 403
             potential_set = current_set + adjust
-            if potential_set > 5 or potential_set < 1:
-                return jsonify(Error="El ajuste es inválido. El valor resultante debe estar entre 1 y 5."), 403
+            otuprm=""
+            otopp=""
+            if potential_set > 4 or potential_set < 1:
+                otuprm="quater"+str(potential_set)+"-uprm"
+                otopp="quater"+str(potential_set)+"-opponent"
 
-            pbp_dao.set_current_set(event_id, potential_set)
+            pbp_dao.set_current_set_basketball(event_id, potential_set,otuprm,otopp)
             return jsonify(MSG="El parcial ha sido actualizado."), 200
 
         except Exception as e:
@@ -590,11 +696,11 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ya ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ya ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             if color == pbp_dao.get_opponent_color(event_id):
                 return jsonify(MSG="No se encontraron cambios en el color."), 200
@@ -656,7 +762,7 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 400
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
@@ -711,11 +817,11 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 400
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             # Validate the athlete number has not been used.
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
@@ -761,11 +867,11 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 400
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             # Validate the athlete number has not been used.
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
@@ -818,11 +924,11 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 400
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
 
@@ -903,11 +1009,11 @@ class BasketballPBPHandler:
                 return jsonify(Error="El ID del evento es inválido."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             if (self._sport_keywords["athlete_prefix"] + str(player_id)) not in pbp_dao.get_opponent_roster(event_id):
                 return jsonify(Error="El atleta no existe."), 404
@@ -948,7 +1054,7 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             self._handle_pbp_action(event_id, action_data, pbp_dao)
             return jsonify(MSG="La acción se ha añadido al sistema."), 200
@@ -986,10 +1092,13 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403.
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
+            if new_action['action_type']=='Time':
+                self._handle_time(event_id,action_id,new_action,pbp_dao)
+            else:
+                self._handle_pbp_edit_action(
+                    event_id, action_id, new_action, pbp_dao)
 
-            self._handle_pbp_edit_action(
-                event_id, action_id, new_action, pbp_dao)
             return jsonify(MSG="Se ha editado la acción exitosamente."), 200
 
         except Exception as e:
@@ -1025,7 +1134,7 @@ class BasketballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             self._handle_remove_pbp_action(event_id, game_action_id, pbp_dao)
             return jsonify(MSG="Se ha removido la acción exitosamente."), 200
@@ -1057,13 +1166,13 @@ class BasketballPBPHandler:
 
             meta = pbp_dao.get_pbp_meta(event_id)
             if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Voleibol."), 403
+                return jsonify(Error="Esta secuencia PBP no corresponde a Baloncesto."), 403
 
             if pbp_dao.is_game_over(event_id):
-                return jsonify(Error="El partido de Voleibol ha finalizado."), 403
+                return jsonify(Error="El partido de Baloncesto ha finalizado."), 403
 
             pbp_dao.set_pbp_game_over(event_id)
-            return jsonify(MSG="Se marcó el partido de Voleibol como finalizado."), 200
+            return jsonify(MSG="Se marcó el partido de Baloncesto como finalizado."), 200
 
         except Exception as e:
             print(str(e))

@@ -7,6 +7,7 @@ import {
   mount,
   Wrapper,
 } from '@vue/test-utils'
+import { waitAnimationFrame } from '../../../../test'
 
 describe('VSelect.ts', () => {
   type Instance = InstanceType<typeof VSelect>
@@ -34,6 +35,10 @@ describe('VSelect.ts', () => {
         ...options,
       })
     }
+  })
+
+  afterEach(() => {
+    document.body.removeChild(el)
   })
 
   it('should use slotted prepend-item', () => {
@@ -415,7 +420,6 @@ describe('VSelect.ts', () => {
 
   /* eslint-disable-next-line max-statements */
   it('should react to different key down', async () => {
-    const sleep = () => new Promise(resolve => window.requestAnimationFrame(resolve))
     const wrapper = mountFunction({
       propsData: {
         items: [1, 2, 3, 4],
@@ -430,7 +434,7 @@ describe('VSelect.ts', () => {
     wrapper.vm.$refs.input.focus()
     wrapper.vm.onKeyDown(event)
 
-    await sleep()
+    await waitAnimationFrame()
 
     expect(blur).toHaveBeenCalled()
     expect(wrapper.vm.isMenuActive).toBe(false)
@@ -441,7 +445,7 @@ describe('VSelect.ts', () => {
       wrapper.vm.onKeyDown(event)
       expect(wrapper.vm.isMenuActive).toBe(true)
 
-      await sleep()
+      await waitAnimationFrame()
 
       // Escape
       event.keyCode = keyCodes.esc
@@ -455,13 +459,13 @@ describe('VSelect.ts', () => {
 
     wrapper.vm.onKeyDown(event)
 
-    await sleep()
+    await waitAnimationFrame()
 
     expect(wrapper.vm.internalValue).toBe(1)
 
     wrapper.vm.onKeyDown(event)
 
-    await sleep()
+    await waitAnimationFrame()
 
     expect(wrapper.vm.internalValue).toBe(2)
 
@@ -469,7 +473,7 @@ describe('VSelect.ts', () => {
     event.keyCode = keyCodes.up
     wrapper.vm.onKeyDown(event)
 
-    await sleep()
+    await waitAnimationFrame()
 
     expect(wrapper.vm.internalValue).toBe(1)
   })

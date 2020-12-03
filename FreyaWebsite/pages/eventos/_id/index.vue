@@ -124,6 +124,7 @@
 							Ver Estadisticas
 						</v-btn>						
 					</v-col>
+					
 				</v-row>
 				
 			</v-container>
@@ -195,7 +196,12 @@ export default {
      * props
      */
     goToPBPSequence(){
-      this.$router.push(`/eventos/${this.eventID}/jugadas-${this.sportName.toLowerCase()}/`)
+		if(this.sportName=='Softbol'){
+          this.$router.push(`/eventos/${this.eventID}/jugadas-beisbol`)
+		}
+        else{
+			this.$router.push(`/eventos/${this.eventID}/jugadas-${this.sportName.toLowerCase()}/`)
+		}
     },
 		/**
 		 * Returns a string denoting whether an event is local 

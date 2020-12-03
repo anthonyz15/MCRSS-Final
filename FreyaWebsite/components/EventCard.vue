@@ -19,7 +19,7 @@
       <v-row class="my-n3">
         <v-col>
           <span>Fecha: </span>
-          <span class="text--secondary"> {{ formatDate() }}</span>
+          <span class="text--secondary ml-1"> {{ formatDate() }}</span>
         </v-col>
       </v-row>
       <v-row v-if="!!opponentName" class="my-n3">
@@ -37,7 +37,45 @@
       <v-btn text color="green darken-1" dark @click="goToEvent"
         >Ver Detalles</v-btn
       >
-    </v-card-actions>
+      <v-spacer />
+      <ShareNetwork
+          class="ml-5 mr-5 mb-5"
+          network="twitter"
+          :url= this.url+this.eventID
+          :title= this.eventSummary 
+          :medua= this.img
+        >
+        <i></i>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-btn color="#00acee" fab small dark target="_blank" v-on="on">
+              <v-icon>mdi-twitter</v-icon>
+            </v-btn>
+          </template>
+          <span>Compartelo en Twitter</span>
+        </v-tooltip>
+        
+      </ShareNetwork>
+      <ShareNetwork
+          class="ml-5 mr-5 mb-5"
+          network="facebook"
+          :url= this.url+this.eventID
+          :title= this.eventSummary 
+          :medua= this.img
+        >
+        <i ></i>
+         <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-btn color="#3b5998" fab small dark  target="_blank" v-on="on">
+              <v-icon>mdi-facebook</v-icon>
+            </v-btn>
+          </template>
+          <span>Compartelo en Facebook</span>
+        </v-tooltip>
+      </ShareNetwork>
+     
+
+    </v-card-actions >
   </v-card>
 </template>
 
@@ -54,6 +92,10 @@ export default {
     opponentScore: Number,
     hasPBP: Boolean
   },
+   data: () => ({
+    url: "https://huella-deportiva-web.ue.r.appspot.com/eventos/"
+  }),
+  
   methods: {
     /**
      * Routes user to event viewer page for
@@ -68,9 +110,12 @@ export default {
      * props
      */
     goToPBPSequence() {
-      this.$router.push(
-        `/eventos/${this.eventID}/jugadas-${this.sportName.toLowerCase()}/`
-      );
+      if(this.sportName=='Softbol'){
+          this.$router.push(`/eventos/${this.eventID}/jugadas-beisbol`)
+		}
+        else{
+			this.$router.push(`/eventos/${this.eventID}/jugadas-${this.sportName.toLowerCase()}/`)
+		}
     },
     /**
      * Formats the date and time for the card.

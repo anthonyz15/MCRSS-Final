@@ -46,6 +46,9 @@ export default {
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
+    
+    'vue-social-sharing/nuxt'
+
   ],
   /*
   ** Axios module configuration
@@ -53,7 +56,7 @@ export default {
   */
   axios: {
     baseURL: 'https://white-smile-272204.ue.r.appspot.com/' //Route for the Flask API Hosted
-    // baseURL: 'http://127.0.0.1:5000/' //Route for the Flask API
+   // baseURL: 'http://127.0.0.1:5000/' //Route for the Flask API
   },
   /*
   ** vuetify module configuration

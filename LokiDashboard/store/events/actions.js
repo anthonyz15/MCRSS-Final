@@ -139,7 +139,12 @@ export default {
             const response = await this.$axios.post('pbp/'+eventJSON.sport_name,{event_id:eventJSON.event_id})
             
             dispatch('notifications/setSnackbar', {text: response.data.MSG, color: 'success'}, {root: true})
-            this.$router.push('/jugadas-voleibol/'+eventJSON.event_id)
+            if(eventJSON.sport_name=='Softbol'){
+                this.$router.push('/jugadas-'+'beisbol'+'/'+eventJSON.event_id)
+            }else{
+                this.$router.push('/jugadas-'+eventJSON.sport_name+'/'+eventJSON.event_id)
+            }
+            
         }catch(error){
             if(!!error.response.data){
                 dispatch('notifications/setSnackbar', {text: error.response.data.Error, color: 'error'}, {root: true})

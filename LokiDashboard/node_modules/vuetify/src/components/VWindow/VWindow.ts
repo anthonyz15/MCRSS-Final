@@ -4,7 +4,7 @@ import './VWindow.sass'
 // Types
 import { VNode, VNodeDirective } from 'vue/types/vnode'
 import { PropType } from 'vue'
-import { TouchHandlers } from 'types'
+import { TouchHandlers } from 'vuetify/types'
 
 // Directives
 import Touch from '../../directives/touch'
@@ -18,13 +18,13 @@ import { BaseItemGroup } from '../VItemGroup/VItemGroup'
 export default BaseItemGroup.extend({
   name: 'v-window',
 
+  directives: { Touch },
+
   provide (): object {
     return {
       windowGroup: this,
     }
   },
-
-  directives: { Touch },
 
   props: {
     activeClass: {

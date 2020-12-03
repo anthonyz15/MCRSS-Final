@@ -91,7 +91,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-btn
-                  v-if="item.sport_name == 'Voleibol' & item.hasPBP"
+                  v-if="(item.sport_name =='Voleibol' || item.sport_name =='Baloncesto'|| item.sport_name == 'Futbol'|| item.sport_name == 'Beisbol'|| item.sport_name == 'Softbol') & item.hasPBP"
                   color="primary"
                   outlined
                   small
@@ -104,7 +104,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-btn
-                  v-if="item.sport_name == 'Voleibol' & !item.hasPBP"
+                  v-if="(item.sport_name =='Voleibol' || item.sport_name =='Baloncesto'|| item.sport_name == 'Futbol'|| item.sport_name == 'Beisbol'|| item.sport_name == 'Softbol')  & !item.hasPBP"
                   color="primary"
                   outlined
                   small
@@ -115,7 +115,7 @@
               </template>
               <span>Crear Play-by-Play</span>
             </v-tooltip>
-            <span class='text' v-if="item.sport_name !='Voleibol'">
+            <span class='text' v-if="item.sport_name !='Voleibol' & item.sport_name !='Baloncesto'  & item.sport_name !='Futbol'  & item.sport_name !='Beisbol' & item.sport_name !='Softbol'">
               N/A
             </span>
           </template> 
@@ -434,7 +434,11 @@ export default {
      */
     goToPBPSequence(event)
     {
-      this.$router.push('/jugadas-'+event.sport_name.toLowerCase()+'/'+event.id)
+      if(event.sport_name=='Softbol'){
+          this.$router.push('/jugadas-'+'beisbol'+'/'+event.id)
+      }else{
+          this.$router.push('/jugadas-'+event.sport_name.toLowerCase()+'/'+event.id)
+      }
     },
 
     /**

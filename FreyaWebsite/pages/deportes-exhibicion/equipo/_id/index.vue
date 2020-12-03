@@ -77,6 +77,42 @@
 										<p>
 											{{current_team.about_team}}
 										</p>
+                    <v-row>
+                    <ShareNetwork
+                        class="ml-5"
+                        network="twitter"
+                        :url= this.url+this.sport_id
+                        :title="''"
+                        >
+                        <i></i>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-btn color="#00acee" fab small dark target="_blank" v-on="on">
+                              <v-icon>mdi-twitter</v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Compartelo en Twitter</span>
+                        </v-tooltip>
+                        
+                      </ShareNetwork>
+                      <ShareNetwork
+                        class="ml-5"
+                        network="facebook"
+                        :url= this.url+this.sport_id
+                        :title="''"
+                        
+                        >
+                        <i ></i>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-btn color="#3b5998" fab small dark  target="_blank" v-on="on">
+                              <v-icon>mdi-facebook</v-icon>
+                            </v-btn>
+                          </template>
+                          <span>Compartelo en Facebook</span>
+                        </v-tooltip>
+                      </ShareNetwork>
+                    </v-row>
 									</v-col>
 								</v-row>
 							</v-container>
@@ -246,7 +282,7 @@ export default {
     
       //NOTE: Using pre-written data for athlete with id:8,
       //      will need to fetch this data below from the API.
-    
+      url:'https://huella-deportiva-web.ue.r.appspot.com/deportes-exhibicion/equipo/',
       about_team:"Because he's the hero Gotham deserves, but not the one it needs right now, so we'll hunt him. Because he can take it, because he's not a hero. He's a silent guardian, a watchful protector, a Dark Knight.",
       ready:false,
       sport_name:'',     

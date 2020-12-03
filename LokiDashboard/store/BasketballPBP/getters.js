@@ -11,6 +11,24 @@ export default {
     gameOver: state => state.gameOver,
     oppColor: state => state.oppColor,
     gameActions: state => state.gameActions,
+
+    uprmFinal: state => {
+        let score=0;
+        for (let i = 0; i < state.uprmSets.length; i++) {
+              score+=state.uprmSets[i];
+        }
+        return score;
+        
+    },
+
+    oppFinal: state => {
+        let score=0;
+        for (let i = 0; i < state.oppSets.length; i++) {
+              score+=state.oppSets[i];
+        }
+        return score;
+        
+    },
     
     currentUPRMSet: state => {
         if (state.currentSet === 0) {
@@ -67,15 +85,30 @@ export default {
         let ftpercentage=0;
         ftpercentage=state.uprmStatistics.freethrow/state.uprmStatistics.freethrowAttempt*100;
         ftpercentage=parseFloat(ftpercentage).toFixed(1);
+        if(!isNaN(ftpercentage)){
         temp["freethrowPercentage"]=ftpercentage;
+        }
+        else{
+            temp["freethrowPercentage"]=0;
+        }
         let tppercentage=0;
         tppercentage=state.uprmStatistics.twopoints/state.uprmStatistics.twopointsAttempt*100;
         tppercentage=parseFloat(tppercentage).toFixed(1);
-        temp["twopointsPercentage"]=tppercentage;
+        if(!isNaN(tppercentage)){
+            temp["twopointsPercentage"]=tppercentage;
+            }
+            else{
+                temp["twopointsPercentage"]=0;
+            }
         let trppercentage=0;
         trppercentage=state.uprmStatistics.threepoints/state.uprmStatistics.threepointsAttempt*100;
         trppercentage=parseFloat(trppercentage).toFixed(1);
-        temp["threepointsPercentage"]=trppercentage;
+        if(!isNaN(trppercentage)){
+            temp["threepointsPercentage"]=trppercentage;
+            }
+            else{
+                temp["threepointsPercentage"]=0;
+            }
         return temp;
     },
     
@@ -84,15 +117,30 @@ export default {
         let ftpercentage=0;
         ftpercentage=state.oppStatistics.freethrow/state.oppStatistics.freethrowAttempt*100;
         ftpercentage=parseFloat(ftpercentage).toFixed(1);
-        temp["freethrowPercentage"]=ftpercentage;
+        if(!isNaN(ftpercentage)){
+            temp["freethrowPercentage"]=ftpercentage;
+            }
+            else{
+                temp["freethrowPercentage"]=0;
+            }
         let tppercentage=0;
         tppercentage=state.oppStatistics.twopoints/state.oppStatistics.twopointsAttempt*100;
         tppercentage=parseFloat(tppercentage).toFixed(1);
-        temp["twopointsPercentage"]=tppercentage;
+        if(!isNaN(tppercentage)){
+            temp["twopointsPercentage"]=tppercentage;
+            }
+            else{
+                temp["twopointsPercentage"]=0;
+            }
         let trppercentage=0;
         trppercentage=state.oppStatistics.threepoints/state.oppStatistics.threepointsAttempt*100;
         trppercentage=parseFloat(trppercentage).toFixed(1);
-        temp["threepointsPercentage"]=trppercentage;
+        if(!isNaN(trppercentage)){
+            temp["threepointsPercentage"]=trppercentage;
+            }
+            else{
+                temp["threepointsPercentage"]=0;
+            }
         return temp;
     },
     uprmAthleteStatistics: state => state.uprmAthleteStatistics,

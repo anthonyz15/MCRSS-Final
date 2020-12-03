@@ -46,7 +46,7 @@
     </v-content>
     <v-footer fixed app>
       <v-spacer></v-spacer>
-      <span>MJOLNIR &copy; {{ new Date().getFullYear() }}</span>
+      <span>MJOLNIR/MCRSS &copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
   </v-app>
 </template>
@@ -66,6 +66,10 @@ export default {
           icon: "mdi-calendar-multiple",
           title: "Eventos",
           to: "/eventos"
+        },
+        {
+          title: "Multimedios",
+          to: "/multimedios"
         },
         {
           icon: "mdi-account-group",

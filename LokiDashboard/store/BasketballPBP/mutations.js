@@ -332,7 +332,7 @@ export default {
                 case "2Points":
                     result[athlete_index].twopoints++;
                     result[athlete_index].twopointsAttempt++;
-                    result[athlete_index].points+2;
+                    result[athlete_index].points+=2;
                     result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
                     result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
                     break;
@@ -346,7 +346,7 @@ export default {
                 case "3Points":
                     result[athlete_index].threepoints++;
                     result[athlete_index].threepointsAttempt++;
-                    result[athlete_index].points+3;
+                    result[athlete_index].points+=3;
                     result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
                     result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
                     break;
@@ -454,7 +454,7 @@ export default {
                 case "2Points":
                     result[athlete_index].twopoints++;
                     result[athlete_index].twopointsAttempt++;
-                    result[athlete_index].points+2;
+                    result[athlete_index].points+=2;
                     result[athlete_index].twopointsPercentage=result[athlete_index].twopoints/result[athlete_index].twopointsAttempt*100;
                     result[athlete_index].twopointsPercentage=parseFloat(result[athlete_index].twopointsPercentage).toFixed(1);
                     break;
@@ -468,7 +468,7 @@ export default {
                 case "3Points":
                     result[athlete_index].threepoints++;
                     result[athlete_index].threepointsAttempt++;
-                    result[athlete_index].points+3;
+                    result[athlete_index].points+=3;
                     result[athlete_index].threepointsPercentage=result[athlete_index].threepoints/result[athlete_index].threepointsAttempt*100;
                     result[athlete_index].threepointsPercentage=parseFloat(result[athlete_index].threepointsPercentage).toFixed(1);
                     break;

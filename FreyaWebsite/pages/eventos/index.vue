@@ -71,7 +71,7 @@
       </v-row>
 
       <v-row v-if="!!filteredEvents">
-        <v-col v-for="(value, key) in filteredEvents" :key="key" cols="12" sm="6" lg="4">
+        <v-col v-for="(value, key) in filteredEvents" :key="key" cols="12" sm="10" lg="6">
           <EventCard
             :eventID="value.id"
             :sportName="value.sport_name"
@@ -87,7 +87,7 @@
       </v-row>
 
       <v-row v-else>
-        <v-col v-for="(value, key) in events" :key="key" cols="12" sm="6" lg="4">
+        <v-col v-for="(value, key) in events" :key="key" cols="12" sm="10" lg="6">
           <EventCard
             :eventID="value.id"
             :sportName="value.sport_name"
@@ -104,6 +104,7 @@
     </div>
     <LoadingScreen v-else name-of-data="Eventos" />
   </v-container>
+  
 </template>
 
 <script>

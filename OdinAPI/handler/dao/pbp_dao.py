@@ -94,6 +94,7 @@ class PBPDao:
             str(int(athlete_entry["athlete_id"]))
         self._rtdb.reference(path).set(athlete_entry)
 
+
     def set_opponent_athlete(self, event_id, athlete_entry):
         """
         Add an athlete to opponent roster or updates its value if exists in the system.
@@ -217,7 +218,7 @@ class PBPDao:
             str(int(event_id)) + self._db_keywords["meta"]
         return self._rtdb.reference(path).get()
 
-    def set_current_set(self, event_id, new_set):
+    def set_current_set_basketball(self, event_id, new_set,otuprm,otopp):
         """
         Updates the current set or period for a PBP sequence.
         This function sets the current set or period value of a PBP sequence given its id.
@@ -232,7 +233,33 @@ class PBPDao:
 
         path = self._db_keywords["root"] + \
             str(int(event_id)) + self._db_keywords["set"]
+        self._rtdb.reference(path).set(int(new_set))
 
+        if new_set > 4:
+            temp= {
+                otuprm:0,
+                otopp:0
+            }
+
+
+            path = self._db_keywords["root"] + str(int(event_id))+'/'+self._db_keywords["score-key"]
+            self._rtdb.reference(path).update(temp)
+
+    def set_current_set(self, event_id,new_set):
+        """
+        Updates the current set or period for a PBP sequence.
+        This function sets the current set or period value of a PBP sequence given its id.
+
+        Args
+            event_id: integer corresponding to an event id.
+            new_set: integer corresponding to the new set or period value.
+
+        Returns:
+            void
+        """
+
+        path = self._db_keywords["root"] + \
+            str(int(event_id)) + self._db_keywords["set"]
         self._rtdb.reference(path).set(int(new_set))
 
     def get_current_set(self, event_id):
@@ -499,6 +526,7 @@ class PBPDao:
         Returns:
             ID corresponding to the newly inserted game action.
         """
+
         path_actions = self._db_keywords["root"] + \
             str(int(event_id)) + \
             self._db_keywords["actions"] + "/" + str(int(time()))
@@ -535,6 +563,25 @@ class PBPDao:
             str(int(event_id)) + \
             self._db_keywords["actions"] + "/" + str(int(action_id))
         return self._rtdb.reference(path).set(action_content)
+
+    def edit_pbp_time_game_action(self, event_id, action_id, time):
+        """
+        Edits a game action from PBP sequence.
+        This function updates a particular game action from PBP sequence.
+
+        Args
+            event_id: integer corresponding to an event id.
+            action_id: string corresponding to the game action to edit.
+            action_content: JSON object corresponding to the new action content.
+
+        Returns:
+            void
+        """
+        timepath="/time"
+        path = self._db_keywords["root"] + \
+            str(int(event_id)) + \
+            self._db_keywords["actions"] + "/" + str(int(action_id) )+ timepath
+        return self._rtdb.reference(path).set(time)
 
     def remove_pbp_game_action(self, event_id, action_id):
         """

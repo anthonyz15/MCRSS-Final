@@ -100,7 +100,47 @@
 												{{short_bio}}
 											</p>
 										</v-card-text>
+										<v-row>
+										<ShareNetwork
+										class="ml-9"
+										network="twitter"
+										:url= this.url+this.id
+										:title=" this.first_name+' '+this.last_names"
+										:media= this.profile_image_link
+										>
+										<i class="fab fah fa-lg fa-twitter"></i>
+										<v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-btn color="#00acee" fab small dark target="_blank" v-on="on">
+											<v-icon>mdi-twitter</v-icon>
+											</v-btn>
+										</template>
+										<span>Compartelo en Twitter</span>
+										</v-tooltip>
+										
+									</ShareNetwork>
+									<ShareNetwork
+										class="ml-7"
+										network="facebook"
+										:url= this.url+this.id
+										:title=" this.first_name+' '+this.last_names"
+										:media= this.profile_image_link
+										>
+										<i ></i>
+										<v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-btn color="#3b5998" fab small dark  target="_blank" v-on="on">
+											<v-icon>mdi-facebook</v-icon>
+											</v-btn>
+										</template>
+										<span>Compartelo en Facebook</span>
+										</v-tooltip>
+
+									    </ShareNetwork>
+										</v-row>
 									</v-col>
+									
+									
 								
 								</v-row>
 						
@@ -248,7 +288,9 @@ export default {
 			headers:[],
 			headers_:[],
 			statistics_per_season:[],
-			aggregate_statistics_per_season:[]
+			aggregate_statistics_per_season:[],
+			url:'https://huella-deportiva-web.ue.r.appspot.com/atletas/',
+			id:'',
     }),//end of data()
 		
 		methods: {
@@ -278,7 +320,7 @@ export default {
 						this.ready = true
 						return true
 					}
-
+					this.id = this.athlete.id
 					this.first_name = this.athlete.fName
 					this.last_names = this.athlete.lName	
 					if(this.athlete.mName)

@@ -8,6 +8,7 @@ export default {
             const response = await this.$axios.get('events/')
             commit("SET_EVENTS", response.data.Events)
             commit("SET_EVENT",null)
+            
 
         }catch(error){
             

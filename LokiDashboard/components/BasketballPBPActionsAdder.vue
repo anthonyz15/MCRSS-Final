@@ -5,7 +5,6 @@
         <v-row justify="center">
           <v-card-title>{{ uprm_team_name }}</v-card-title>
         </v-row>
-
         <v-tooltip bottom v-for="athlete in uprm_roster" :key="athlete.number">
           <template v-slot:activator="{ on }">
             <v-btn
@@ -53,7 +52,7 @@
         </v-row>
       </v-card>
     </v-col>
-    <v-col allign="center">
+    <v-col allign="center" class="mx-n12">
       <v-row>
         <v-tooltip bottom v-for="button in action_buttons" :key="button.key">
           <template v-slot:activator="{ on }">
@@ -67,7 +66,7 @@
                     light
                     color="white"
                     @click.native="clear_action_buttons()"
-                    width="175"
+                    width="200"
                     v-on="on"
                   >{{ map_action(button.action_type) }}</v-btn>
                   <v-btn
@@ -77,7 +76,7 @@
                     dark
                     color="primary"
                     @click.native="set_action_button(button.key)"
-                    width="175"
+                    width="200"
                     v-on="on"
                   >{{ map_action(button.action_type) }}</v-btn>
                 </v-row>
@@ -277,7 +276,8 @@ export default {
     uprm_roster: [],
     valid_uprm_roster: [],
     opp_roster: [],
-    opp_color: String
+    opp_color: String,
+    time:String
   },
 
   data: () => ({
@@ -296,14 +296,17 @@ export default {
     // Action button flags.
     action_buttons: [
       { key: 1, action_type: "Freethrow", button_state: false },
-      { key: 2, action_type: "2Points", button_state: false },
-      { key: 3, action_type: "3Points", button_state: false },
-      { key: 4, action_type: "Rebound", button_state: false },
-      { key: 5, action_type: "Assist", button_state: false },
-      { key: 6, action_type: "Steals", button_state: false },
-      { key: 7, action_type: "Blocks", button_state: false },
-      { key: 8, action_type: "Turnover", button_state: false },
-      { key: 9, action_type: "Foul", button_state: false },
+      { key: 2, action_type: "FreethrowMiss", button_state: false },
+      { key: 3, action_type: "2Points", button_state: false },
+      { key: 4, action_type: "2PointsMiss", button_state: false },
+      { key: 5, action_type: "3Points", button_state: false },
+      { key: 6, action_type: "3PointsMiss", button_state: false },
+      { key: 7, action_type: "Rebound", button_state: false },
+      { key: 8, action_type: "Assist", button_state: false },
+      { key: 9, action_type: "Steals", button_state: false },
+      { key: 10, action_type: "Blocks", button_state: false },
+      { key: 11, action_type: "Turnover", button_state: false },
+      { key: 12, action_type: "Foul", button_state: false },
       
     ],
 
@@ -396,7 +399,8 @@ export default {
         data: {
           athlete_id: id,
           action_type: action,
-          team: team_val
+          team: team_val,
+          time: this.time
         }
       };
 
@@ -433,11 +437,20 @@ export default {
         case "Freethrow":
           return "Tiro Libre";
 
+        case "FreethrowMiss":
+          return "Tiro Libre Fallado";
+
         case "2Points":
-          return "2 Puntos";
+          return "Tiro de Campo";
+        
+        case "2PointsMiss":
+          return "Tiro de Campo Fallado";
 
         case "3Points":
-          return "3 Puntos";
+          return "Tiro de Tres";
+        
+        case "3PointsMiss":
+          return "Tiro de Tres Fallado";
 
         case "Assist":
           return "Asistencia";

@@ -2,18 +2,18 @@ import { rtdb } from '~/services/firebaseInit.js'
 
 export default {
 
-    // Set async function for handling Firebase set scores updates (each team has 5 set scores).
+    // Set async function for handling Firebase set scores updates.
     async handleSetScores({ commit, dispatch }, event_id) {
         try {
 
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 10; i++) {
                 // Async functions for UPRM scores.
-                await rtdb().ref("/v1/" + event_id + "/score/set" + i + "-uprm").on('value', function (snapshot) {
+                await rtdb().ref("/v1/" + event_id + "/score/quater" + i + "-uprm").on('value', function (snapshot) {
                     let entry = { set: i, score: snapshot.val() };
                     commit("UPDATE_UPRM_SET", entry)
                 });
                 // Async functions for opponent scores.
-                await rtdb().ref("/v1/" + event_id + "/score/set" + i + "-opponent").on('value', function (snapshot) {
+                await rtdb().ref("/v1/" + event_id + "/score/quater" + i + "-opponent").on('value', function (snapshot) {
                     let entry = { set: i, score: snapshot.val() };
                     commit("UPDATE_OPP_SET", entry)
                 });
@@ -170,9 +170,9 @@ export default {
         try {
             for (let i = 1; i <= 5; i++) {
                 // Async functions for UPRM scores.
-                await rtdb().ref("/v1/" + event_id + "/score/set" + i + "-uprm").off();
+                await rtdb().ref("/v1/" + event_id + "/score/quater" + i + "-uprm").off();
                 // Async functions for opponent scores.
-                await rtdb().ref("/v1/" + event_id + "/score/set" + i + "-opponent").off();
+                await rtdb().ref("/v1/" + event_id + "/score/quater" + i + "-opponent").off();
             }
 
         } catch (error) {
@@ -345,12 +345,12 @@ export default {
         }
     },
 
-    // Send a notification in case athlete is selected without previously having a game action chosen.
+   
     notifyNotActionSelected({ commit, dispatch }) {
         dispatch('notifications/setSnackbar', { text: "Debe seleccionar el tipo de jugada antes de escoger un jugador.", color: 'error' }, { root: true });
     },
 
-    // Set end to a PBP sequence.
+    
     async endPBPSequence({ commit, dispatch }, payload) {
         try {
             const response = await this.$axios.post(`/pbp/Baloncesto/end`, payload);

@@ -334,7 +334,52 @@ class MedalBasedEventDAO:
             result.append(row)
         return result
 
-    
+    def getAggregatedAthleteStatisticsCareer(self, aID, seasonYear):
+        """
+        Gets the aggregated statistics for a given athlete and season.
+
+        This function uses and ID and a year number to perform a query to the database
+        that gets the aggregated statistics in the system that match the given ID and season year.
+
+        Args:
+            aID: The ID of the athlete of which statistics need to be fetched.
+            seasonYear: the season year of which statistics need to be fetched.
+
+
+        Returns:
+            A list containing the response to the database query
+            containing the aggregated statistics in the system containing
+            the matching record for the given ID and season year.
+        """
+        cursor = self.conn.cursor()
+
+        query = """
+                with aggregate_query as(
+                SELECT
+                count(medal_id) as medals_earned, individual_medal_event.medal_id as medal_id,
+                individual_medal_event.athlete_id,individual_medal_event.category_id
+
+                FROM individual_medal_event
+                INNER JOIN event ON event.id = individual_medal_event.event_id
+                INNER JOIN team on team.id = event.team_id
+                WHERE athlete_id = %s and team.season_year >= %s and individual_medal_event.medal_id is not null and
+                individual_medal_event.is_invalid = false
+                GROUP BY individual_medal_event.athlete_id,individual_medal_event.medal_id, individual_medal_event.category_id)
+                select 
+                medals_earned, type_of_medal,C.name,
+                athlete_id, first_name, middle_name, last_names, number, profile_image_link
+                from aggregate_query
+                INNER JOIN athlete on athlete.id = aggregate_query.athlete_id
+                INNER JOIN category as C on aggregate_query.category_id = C.id  
+                INNER JOIN medal as M on aggregate_query.medal_id = M.id
+                ;
+                """
+        cursor.execute(query, (aID, seasonYear,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
     def getAllAggregatedAthleteStatisticsPerSeason(self,sID,seasonYear):
         """
         Gets all the aggregated statistics for a given athlete and season. 

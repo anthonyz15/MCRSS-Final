@@ -396,6 +396,53 @@ class MedalBasedEventHandler():
          
         return jsonify(Medal_Based_Event_Season_Athlete_Statistics = mappedResult), 200
 
+    def getAggregatedAthleteStatisticsCareer(self, aID, seasonYear):
+        """
+        Gets aggregated statistics for a given athlete during a given season.
+
+        Calls the MedalBasedEventDAO to get aggregated event statistics and maps the result to
+        to a JSON that contains all the statistics for that athlete during the given season
+        in the system. That JSON object is then returned.
+
+        Args:
+            seasonYear: the season year of which statistics need to be fetched
+            aID: The ID of the athlete of which statistics need to be fetched
+
+        Returns:
+            A JSON containing aggregated  statistics in the system for the specified athlete and season year.
+        """
+
+        if not isinstance(aID, int) or not isinstance(seasonYear, int):
+            return jsonify(Error="Argumentos incorrectos fueron dados."), 400
+
+        # validate existing athlete
+
+        try:
+            a_dao = AthleteDAO()
+            athlete = a_dao.athleteExists(aID)
+            if not athlete:
+                return jsonify(Error="El atleta con id:{} no fue encontrado.".format(aID)), 404
+        except:
+            return jsonify(Error="No se pudo verificar el atleta."), 500
+
+        # validate existing medal_based_event entries and format returnable
+
+        try:
+            dao = MedalBasedEventDAO()
+            result = dao.getAggregatedAthleteStatisticsCareer(aID, seasonYear)
+            if not result:
+                return jsonify(
+                    Error="Estadísticas de un evento de medalla no fueron encontradas para el atleta con id: {}.".format(
+                        aID)), 404
+            mappedResult = []
+            for row in result:
+                mappedResult.append(self.mapAthleteSeasonAggregate(row))
+            # print(mappedResult)
+        except:
+            return jsonify(Error="No se pudo verificar un evento de medalla."), 500
+
+        return jsonify(Medal_Based_Event_Season_Athlete_Statistics=mappedResult), 200
+
     
     def getAllAggregatedAthleteStatisticsPerSeason(self,sID,seasonYear):
         """

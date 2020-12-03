@@ -501,6 +501,52 @@ class BasketballEventHandler(EventResultHandler):
         return jsonify(Basketball_Event_Season_Athlete_Statistics=mappedResult), 200
 
     # NEW
+    def getAggregatedAthleteStatisticsCareer(self, aID, seasonYear):
+        """
+        Gets aggregated statistics for a given athlete during a given season.
+
+        Calls the BasketballEventDAO to get aggregated event statistics and maps the result to
+        to a JSON that contains all the statistics for that athlete during the given season
+        in the system. That JSON object is then returned.
+
+        Args:
+            seasonYear: the season year of which statistics need to be fetched
+            aID: The ID of the athlete of which statistics need to be fetched
+
+        Returns:
+            A JSON containing aggregated  statistics in the system for the specified athlete and season year.
+        """
+
+        # validate existing athlete
+
+        try:
+            a_dao = AthleteDAO()
+            athlete = a_dao.athleteExists(aID)
+            if not athlete:
+                return jsonify(Error="Atleta con ID:{} no se encontro.".format(aID)), 400
+        except (TypeError, ValueError):
+            return jsonify(Error="Solicitud Incorrecta, Error de Tipo."), 400
+        except:
+            return jsonify(Error="No se pudo verificar athlete desde el DAO."), 500
+
+        # validate existing basketball_event entries and format returnable
+
+        try:
+            dao = BasketballEventDAO()
+            result = dao.getAggregatedAthleteStatisticsCareer(aID, seasonYear)
+            if not result:
+                return jsonify(
+                    Error="Estadisticas de Evento de Baloncesto no se encontraron para el atleta con ID:{}.".format(aID)), 404
+            mappedResult = self.mapAthleteSeasonAggregate(result)
+            # print(mappedResult)
+        except (TypeError, ValueError):
+            return jsonify(Error="Solicitud Incorrecta, Error de Tipo."), 400
+        except:
+            return jsonify(Error="No se pudo verificar Evento de Baloncesto desde el DAO."), 500
+
+        return jsonify(Basketball_Event_Season_Athlete_Statistics=mappedResult), 200
+
+    # NEW
     def getAllAggregatedAthleteStatisticsPerSeason(self, sID, seasonYear):
         """
         Gets all aggregated statistics for athletes during a given season. 

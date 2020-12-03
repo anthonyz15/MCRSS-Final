@@ -15,8 +15,8 @@
         <v-toolbar-title class="title"> {{sportName}} </v-toolbar-title>
         <v-spacer />
       </v-toolbar>
-      <v-container >
-        <v-row align="center" justify="center" :style="{ backgroundImage:'url(https://cdn2.vectorstock.com/i/1000x1000/26/61/isolated-aerial-view-of-a-basketball-court-vector-23702661.jpg)' }">
+      <v-container  >
+        <v-row align="center" justify="center">
           <BasketballScore
             :uprm_team="uprm_team_name"
             :opp_team="opponentName"
@@ -26,6 +26,8 @@
             :current_uprm_score="currentUPRMSet"
             :current_opp_score="currentOppSet"
             :event_id="event_id"
+            :uprmFinal="uprmFinal"
+            :oppFinal="oppFinal"
             v-if="$store.state.userAuth.userPermissions[5]['18']"
           />
           <BasketballScoreDisplayOnly
@@ -67,6 +69,7 @@
                   :valid_uprm_roster="validUPRMRoster"
                   :opp_roster="oppRoster"
                   :opp_color="oppColor"
+                  :time="''"
                 />
               </v-row>
             </div>
@@ -146,9 +149,10 @@
                 in_color="gray"
                 :id="action.key"
                 :event_id="event_id"
+                :time="action.time"
               />
               <BasketballGameAction 
-                v-else-if=" action.team === 'opponent' "
+                v-else-if=" action.team === 'opponent' && (action.action_type!='FreethrowMiss' && action.action_type!='2PointsMiss' && action.action_type!='3PointsMiss')"
                 align="center"
                 justify="center"
                 :action_type="action.action_type"
@@ -163,9 +167,10 @@
                 :uprmAthletes="uprmRoster"
                 :oppAthletes="oppRoster"
                 team="Oponente" 
+                :time="action.time"
               />
               <BasketballGameAction
-                v-else
+                v-else-if="action.team === 'uprm' && (action.action_type!='FreethrowMiss' && action.action_type!='2PointsMiss' && action.action_type!='3PointsMiss')"
                 align="center"
                 justify="center"
                 :action_type="action.action_type"
@@ -180,6 +185,7 @@
                 :uprmAthletes="uprmRoster"
                 :oppAthletes="oppRoster"
                 team="UPRM"
+                :time="action.time"
                 
               />
             </v-container>
@@ -198,32 +204,39 @@
                     <template v-slot:default>
                       <thead>
                         <tr>
-                          <th class="text-center">EQUIPO</th>
-                          <th class="text-center">PARCIAL 1</th>
-                          <th class="text-center">PARCIAL 2</th>
-                          <th class="text-center">PARCIAL 3</th>
-                          <th class="text-center">PARCIAL 4</th>
+                          <th class="text-center">EQUIPO</th> 
+                          <th v-for="(n,index) in 4" class="text-center" :key="n + 500">PARCIAL {{index+1}}</th>
+                          <th  class="text-center" v-if="currentSet > 4">OT 1 </th>
+                          <th  class="text-center" v-if="currentSet > 5 ">OT 2 </th>
+                          <th  class="text-center" v-if="currentSet > 6 ">OT 3 </th>
+                          <th  class="text-center" v-if="currentSet > 7 ">OT 4 </th>
+                          <th  class="text-center" v-if="currentSet > 8 ">OT 5 </th>
+                          <th  class="text-center" v-if="currentSet > 9">OT 6 </th>
                           <th class="text-center">FINAL</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr :key="2525">
-                          <td class="text-center">{{ uprm_team_name }}</td>
-                          <td class="text-center">{{ uprmSets[0] }}</td>
-                          <td class="text-center">{{ uprmSets[1] }}</td>
-                          <td class="text-center">{{ uprmSets[2] }}</td>
-                          <td class="text-center">{{ uprmSets[3] }}</td>
-                          <td class="text-center">{{ uprmSets[3]+uprmSets[2]+uprmSets[1]+uprmSets[0] }}</td>
-
-                          
+                        <tr  :key="2527">
+                          <td  class="text-center">{{ uprm_team_name }}</td>
+                          <td v-for="(value,i) in 4" :key="uprmSets[value]" class="text-center">{{ uprmSets[i]}}</td>
+                          <td  class="text-center" v-if="currentSet > 4">{{ uprmSets[4]}}</td>
+                          <td  class="text-center" v-if="currentSet > 5">{{ uprmSets[5]}} </td>
+                          <td  class="text-center" v-if="currentSet > 6 ">{{ uprmSets[6]}} </td>
+                          <td  class="text-center" v-if="currentSet > 7 ">{{ uprmSets[7]}} </td>
+                          <td  class="text-center" v-if="currentSet > 8 ">{{ uprmSets[8]}} </td>
+                          <td  class="text-center" v-if="currentSet > 9">{{ uprmSets[9]}} </td>
+                          <td class="text-center">{{uprmFinal}}</td> 
                         </tr>
-                        <tr :key="2526">
+                        <tr :key="2528">
                           <td class="text-center">{{ opponentName }}</td>
-                          <td class="text-center">{{ oppSets[0] }}</td>
-                          <td class="text-center">{{ oppSets[1] }}</td>
-                          <td class="text-center">{{ oppSets[2] }}</td>
-                          <td class="text-center">{{ oppSets[3] }}</td>
-                          <td class="text-center">{{ oppSets[3]+oppSets[2]+oppSets[1]+oppSets[0] }}</td>
+                          <td v-for="(value,i) in 4" :key="oppSets[value]" class="text-center">{{ oppSets[i]}}</td>
+                          <td  class="text-center" v-if="currentSet > 4">{{ oppSets[4]}}</td>
+                          <td  class="text-center" v-if="currentSet > 5">{{ oppSets[5]}} </td>
+                          <td  class="text-center" v-if="currentSet > 6 ">{{ oppSets[6]}} </td>
+                          <td  class="text-center" v-if="currentSet > 7 ">{{ oppSets[7]}} </td>
+                          <td  class="text-center" v-if="currentSet > 8 ">{{ oppSets[8]}} </td>
+                          <td  class="text-center" v-if="currentSet > 9">{{ oppSets[9]}} </td>
+                          <td  class="text-center">{{oppFinal}}</td>
                         </tr>
                       </tbody>
                     </template>
@@ -410,21 +423,21 @@ export default {
             {text: "Número", value: "number", align: "center" },
             {text: "Nombre", value: "name", align: "center" },
             {text: "Tiros de Campo Exitosos",value: "twopoints", align: "center" },
-            {text: "Intentos de Tiro de Campo", value: "TBD", align: "center" },
-            {text: "Porcentaje de Tiro de Campo (%)",value: "TBD", align: "center" },
+            {text: "Intentos de Tiro de Campo", value: "twopointsAttempt", align: "center" },
+            {text: "Porcentaje de Tiro de Campo (%)",value: "twopointsPercentage", align: "center" },
             {text: "Tiros de Tres Puntos Exitosos",value: "threepoints", align: "center" },
-            {text: "Intentos de Tiro de Tres",value: "TBD", align: "center"  },
-            {text: "Porcentaje de Tiro de Tres (%)",value: "TBD" , align: "center" },
+            {text: "Intentos de Tiro de Tres",value: "threepointsAttempt", align: "center"  },
+            {text: "Porcentaje de Tiro de Tres (%)",value: "threepointsPercentage" , align: "center" },
             {text: "Tiros Libres Exitosos",value: "freethrow", align: "center" },
-            {text: "Intentos de Tiro Libre",value: "TBD", align: "center" },
-            {text: "Porcentaje de Tiro Libre (%)",value: "TBD", align: "center" },
+            {text: "Intentos de Tiro Libre",value: "freethrowAttempt", align: "center" },
+            {text: "Porcentaje de Tiro Libre (%)",value: "freethrowPercentage", align: "center" },
             {text: "Asistencias", value: "assists", align: "center"  },
             {text: "Bloqueos", value: "blocks" , align: "center"  },
             {text: "Rebotes", value: "rebounds" , align: "center"  },
-            {text: "Robos", value: ".steals", align: "center"  },
+            {text: "Robos", value: "steals", align: "center"  },
             {text: "Perdidas de Balón", value: "turnovers" , align: "center" },   
             {text: "Faltas", value: "foul" , align: "center" },  
-            {text: "Puntos", value: "TBD" , align: "center"  }   
+            {text: "Puntos", value: "points" , align: "center"  }   
     ],
 
     event_id: Number,
@@ -439,32 +452,11 @@ export default {
         (!!v && v.length > 0 && v.length <= 100) ||
         "Las notificaciones deben tener entre 1 y 100 caracteres."
     ],
-    plays_map: [
-      { eng: "freethrow", esp: "Tirolibre" },
-      { eng: "2Points", esp: "2 Puntos" },
-      { eng: "3Points", esp: "3 Puntos" },
-      { eng: "Assists", esp: "Asistencia" },
-      { eng: "blocks", esp: "Tapón" },
-      { eng: "Rebounds", esp: "Rebote" },
-      { eng: "Steals", esp: "Robo" },
-      { eng: "Turnovers", esp: "Perdida de balon" },
-      { eng: "Fouls", esp: "Falta" },
-    ],
     uprm_color: "primary",
     notification: "Notification",
     uprm_team_name: "uprm",
     opp_keyword: "opponent",
-    plays_map: [
-      { eng: "freethrow", esp: "Tirolibre" },
-      { eng: "2Points", esp: "2 Puntos" },
-      { eng: "3Points", esp: "3 Puntos" },
-      { eng: "Assists", esp: "Asistencia" },
-      { eng: "blocks", esp: "Tapón" },
-      { eng: "Rebounds", esp: "Rebote" },
-      { eng: "Steals", esp: "Robo" },
-      { eng: "Turnovers", esp: "Perdida de balon" },
-      { eng: "Fouls", esp: "Falta" },
-    ]
+   
   }),
   methods: {
     sendAdjust(team_name, adjust_no) {
@@ -531,7 +523,6 @@ export default {
       }
       // If athlete is opponent, just return its name.
       if (team === "opponent") {
-        console.log(roster[athlete_index].name)
         return roster[athlete_index].name;
       }
       // Otherwise, build its name using the structure established by Odin.
@@ -627,6 +618,8 @@ export default {
     ...mapGetters({
       uprmSets: "BasketballPBP/uprmSets",
       oppSets: "BasketballPBP/oppSets",
+      uprmFinal: "BasketballPBP/uprmFinal",
+      oppFinal: "BasketballPBP/oppFinal",
       currentUPRMSet: "BasketballPBP/currentUPRMSet",
       currentOppSet: "BasketballPBP/currentOppSet",
       currentSet: "BasketballPBP/currentSet",
