@@ -27,6 +27,25 @@ export default{
         state.multimedias = multimedias
     },
 
+     /**
+     * Mutation to set the loaded multimedia posts list in the state.
+     * @param {*} state vuex state object
+     * @param {*} multimedias loaded multimedia posts list with objects containing multimedia post data
+     */
+    SET_TEXT(state,text){
+        //Set loaded multimedia posts list
+        state.text = text
+    },
+     /**
+     * Mutation to set the loaded multimedia posts list in the state.
+     * @param {*} state vuex state object
+     * @param {*} multimedias loaded multimedia posts list with objects containing multimedia post data
+     */
+    SET_LIVE(state,live){
+        //Set loaded multimedia posts list
+        state.live = live
+    },
+
     /**
      * Mutation to filter the state's multimedia posts effectively deleting them.
      * @param {*} state vuex state object

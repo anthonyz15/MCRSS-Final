@@ -101,9 +101,10 @@ export default {
      */
     async editMultimedia({ commit, dispatch }, multimediaJSON) {
         try {
-            const response = await this.$axios.put('multimedia/' + multimediaJSON.mid, multimediaJSON)
+
+            const response = await this.$axios.put('multimedia/' + multimediaJSON.multimedia_id, multimediaJSON)
             commit("UPDATE_MULTIMEDIA", response.data.Multimedia)
-            dispatch('notifications/setSnackbar', { text: `La publicación multimedia con identificador:${multimediaJSON.mid} ha sido editada.`, color: 'success' }, { root: true })
+            dispatch('notifications/setSnackbar', { text: `La publicación multimedia con identificador: ${multimediaJSON.multimedia_id} ha sido editada.`, color: 'success' }, { root: true })
 
         } catch (error) {
             console.log(error)

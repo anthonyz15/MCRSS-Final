@@ -58,6 +58,24 @@ class UserDAO:
             },
             {
                 "27": False,
+            },
+            {
+                "28": False,
+            },
+            {
+                "29": False,
+            },
+            {
+                "30": False,
+            },
+            {
+                "31": False,
+            },
+            {
+                "32": False,
+            },
+            {
+                "33": False,
             }]
 
         self.conn = psycopg2.connect(connection_url)

@@ -13,4 +13,8 @@ export default{
      */
     multimedias: state => state.multimedias,
 
+    text: state => state.text,
+
+    live: state => state.live,
+
 }

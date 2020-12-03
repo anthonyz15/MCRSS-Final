@@ -89,6 +89,12 @@ def validateRequestPermissions(token, permissionNumber):
             '25': 12,
             '26': 13,
             '27': 14,
+            '28': 15,
+            '29': 16,
+            '30': 17,
+            '31': 18,
+            '32': 19,
+            '33': 20,
         }[permissionNumber]
     index = switch(permissionNumber)
     return(token['permissions'][index][permissionNumber])
@@ -105,6 +111,8 @@ def addMultimedia():
         return jsonify(Error='No hay una sesión valida.'), 401
     
     if request.method == 'POST':
+        if (not (validateRequestPermissions(token, '28'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         #Verify request json is structured correctly
         json = request.get_json(silent=True)
         if not json:
@@ -155,6 +163,8 @@ def editMultimedia(mid):
         return jsonify(Error='No hay una sesión valida.'), 401
     
     if request.method == 'PUT':
+        if (not (validateRequestPermissions(token, '30'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         #Verify request json is structured correctly
         json = request.get_json(silent=True)
         if not json:
@@ -174,6 +184,8 @@ def removeMultimedia(mid):
         return jsonify(Error='No hay una sesión valida.'), 401
     
     if request.method == 'DELETE':
+        if (not (validateRequestPermissions(token, '29'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         handler = MultimediaHandler()
         return handler.removeMultimedia(mid)
 
@@ -181,15 +193,17 @@ def removeMultimedia(mid):
 # --------- AboutUs Routes ---------#
 
 @app.route("/aboutus", methods=['POST'])
-# @token_check
+@token_check
 def addAboutUs():
     # Check if dashboard user making the request has a valid session.
-    # token = extractUserInfoFormToken()
-    # loggedUser = customSession.isLoggedIn(token['user'])
-    # if(loggedUser == None):
-    #     return jsonify(Error='No hay una sesión valida.'), 401
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
 
     if request.method == 'POST':
+        if (not (validateRequestPermissions(token, '31'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         # Verify request json is structured correctly
         json = request.get_json(silent=True)
         if not json:
@@ -222,15 +236,17 @@ def getAboutUsByType(hType):
 
 
 @app.route("/aboutus/<int:hdid>", methods=['PUT'])
-# @token_check
+@token_check
 def editAboutUs(hdid):
     # Check if dashboard user making the request has a valid session.
-    # token = extractUserInfoFormToken()
-    # loggedUser = customSession.isLoggedIn(token['user'])
-    # if(loggedUser == None):
-    #     return jsonify(Error='No hay una sesión valida.'), 401
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
 
     if request.method == 'PUT':
+        if (not (validateRequestPermissions(token, '33'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         # Verify request json is structured correctly
         json = request.get_json(silent=True)
         if not json:
@@ -242,15 +258,17 @@ def editAboutUs(hdid):
 
 
 @app.route("/aboutus/<int:hdid>", methods=['DELETE'])
-# @token_check
+@token_check
 def removeAboutUs(hdid):
     # Check if dashboard user making the request has a valid session.
-    # token = extractUserInfoFormToken()
-    # loggedUser = customSession.isLoggedIn(token['user'])
-    # if(loggedUser == None):
-    #     return jsonify(Error='No hay una sesión valida.'), 401
+    token = extractUserInfoFormToken()
+    loggedUser = customSession.isLoggedIn(token['user'])
+    if(loggedUser == None):
+        return jsonify(Error='No hay una sesión valida.'), 401
 
     if request.method == 'DELETE':
+        if (not (validateRequestPermissions(token, '32'))):
+            return jsonify(Error='El usuario no tiene permiso para acceder a estos recursos.'), 403
         handler = AboutUsHandler()
         return handler.removeAboutUs(hdid)
 

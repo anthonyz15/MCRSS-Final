@@ -12,4 +12,8 @@ export default() =>({
      * List of all multimedia posts.
      */
     multimedias: [],//Used in in the all multimedia posts viewer page.
+
+    text: [],
+
+    live:[],
 })
