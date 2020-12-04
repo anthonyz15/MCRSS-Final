@@ -84,10 +84,16 @@ class BaseballPBPHandler:
         set_path = ""
 
         # Determine proper set path value based on the team that needs the adjust.
-        if team == self._sport_keywords["teams"][0]:
-            set_path = self._sport_keywords["uprm-sets"][current_set - 1]
+        if current_set<9:
+            if team == self._sport_keywords["teams"][0]:
+                set_path = self._sport_keywords["uprm-sets"][current_set - 1]
+            else:
+                set_path = self._sport_keywords["opp-sets"][current_set - 1]
         else:
-            set_path = self._sport_keywords["opp-sets"][current_set - 1]
+            if team == self._sport_keywords["teams"][0]:
+                set_path = "/set" + str(current_set) + "-uprm"
+            else:
+                set_path = "/set" + str(current_set) + "-opponent"
 
         return set_path
 
@@ -104,10 +110,17 @@ class BaseballPBPHandler:
         set_path = ""
 
         # Determine proper set path value based on the team value (returns the opposite team set path).
-        if team == self._sport_keywords["teams"][0]:
-            set_path = self._sport_keywords["opp-sets"][current_set - 1]
+
+        if current_set<9:
+            if team == self._sport_keywords["teams"][0]:
+                set_path = self._sport_keywords["opp-sets"][current_set - 1]
+            else:
+                set_path = self._sport_keywords["uprm-sets"][current_set - 1]
         else:
-            set_path = self._sport_keywords["uprm-sets"][current_set - 1]
+            if team == self._sport_keywords["teams"][0]:
+                set_path = "/set" + str(current_set) + "-opponent"
+            else:
+                set_path = "/set" + str(current_set) + "-uprm"
 
         return set_path
 
@@ -159,6 +172,7 @@ class BaseballPBPHandler:
 
         # Adjust game actions modify the score of the direct team indicated in action["team"].
         # These are not added to the notifications feed (non-relational database).
+
         if action_type == self._sport_keywords["adjust"]:
             # Validate team value is present.
             if "team" not in action:
@@ -473,19 +487,26 @@ class BaseballPBPHandler:
 
             event_info = event_info.get("Event")
 
-            if event_info.get("sport_name") != ('Softbol' or 'Beisbol'):
-                return jsonify(Error="El evento seleccionado no es de Beisbol."), 403
             pbp_dao = BaseballPBPDao()
             if pbp_dao.pbp_exists(event_id):
                 return jsonify(Error="Ya se había creado una secuencia PBP."), 403
 
             # At this point, the event exists and does not have a PBP sequence.
-            game_metadata = {
-                "game-over": {"answer": "No"},
-                "sport": self._sport_keywords["sport"],
-                "current-set": 1,
-                "opp-color": ""
-            }
+            if event_info['sport_name']=='Beisbol':
+                game_metadata = {
+                    "game-over": {"answer": "No"},
+                    "sport": "Beisbol",
+                    "current-set": 1,
+                    "opp-color": ""
+                }
+            elif event_info['sport_name']=='Softbol':
+                game_metadata = {
+                    "game-over": {"answer": "No"},
+                    "sport": "Softbol",
+                    "current-set": 1,
+                    "opp-color": ""
+                }
+
 
             pbp_dao.create_pbp_seq(
                 event_id, game_metadata, self._sport_keywords["score-val"])
@@ -518,8 +539,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if meta["sport"] in self._sport_keywords["sport"] :
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             pbp_dao.remove_pbp_seq(event_id)
             return jsonify(MSG="La secuencia PBP ha sido removida."), 200
@@ -550,19 +570,23 @@ class BaseballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 400
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if meta["sport"] in self._sport_keywords["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             if pbp_dao.is_game_over(event_id):
                 return jsonify(Error="El partido de Beisbol ya ha finalizado."), 403
 
             current_set = pbp_dao.get_current_set(event_id)
             potential_set = current_set + adjust
-            if potential_set < 1: #//potential_set > 9 or
-                return jsonify(Error="El ajuste es inválido. El valor resultante no debe ser menor de 1."), 403
+            if potential_set < 1 or potential_set > 19:
+                return jsonify(Error="El ajuste es inválido. El valor resultante no debe ser menor de 1 o mayor de 19."), 403
+            otuprm = ""
+            otopp = ""
+            if potential_set > 9:
+                otuprm="set"+str(potential_set)+"-uprm"
+                otopp="set"+str(potential_set)+"-opponent"
 
-            pbp_dao.set_current_set(event_id, potential_set)
-            return jsonify(MSG="El parcial ha sido actualizado."), 200
+            pbp_dao.set_current_set_baseball(event_id, potential_set,otuprm,otopp)
+            return jsonify(MSG="La entrada ha sido actualizada."), 200
 
         except Exception as e:
             print(str(e))
@@ -601,8 +625,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ya ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if  meta["sport"] in self._sport_keywords["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             if color == pbp_dao.get_opponent_color(event_id):
                 return jsonify(MSG="No se encontraron cambios en el color."), 200
@@ -667,8 +690,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             uprm_roster = pbp_dao.get_uprm_roster(event_id)
             if uprm_roster and (self._sport_keywords["athlete_prefix"] + str(athlete_id)) in uprm_roster:
@@ -722,8 +744,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             # Validate the athlete number has not been used.
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
@@ -772,8 +793,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             # Validate the athlete number has not been used.
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
@@ -829,8 +849,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if self._sport_keywords["sport"] != meta["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             opponent_roster = pbp_dao.get_opponent_roster(event_id)
 
@@ -875,8 +894,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if meta["sport"] in self._sport_keywords["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             opp_roster = pbp_dao.get_uprm_roster(event_id)
 
@@ -914,8 +932,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if meta["sport"] in self._sport_keywords["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             if (self._sport_keywords["athlete_prefix"] + str(player_id)) not in pbp_dao.get_opponent_roster(event_id):
                 return jsonify(Error="El atleta no existe."), 404
@@ -1063,8 +1080,7 @@ class BaseballPBPHandler:
                 return jsonify(Error="No existe una secuencia PBP para este evento."), 403
 
             meta = pbp_dao.get_pbp_meta(event_id)
-            if meta["sport"] in self._sport_keywords["sport"]:
-                return jsonify(Error="Esta secuencia PBP no corresponde a Beisbol."), 403
+
 
             if pbp_dao.is_game_over(event_id):
                 return jsonify(Error="El partido de Beisbol ha finalizado."), 403

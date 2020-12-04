@@ -149,7 +149,7 @@ export default {
 
                 case "RunBattedIn":
                     result.runBattedIn++;
-                    result.run++;
+                    
                     break;
 
                 case "LeftOnBase":
@@ -228,7 +228,7 @@ export default {
 
                 case "RunBattedIn":
                     result.runBattedIn++;
-                    result.run++;
+                   
                     break;
 
                 case "LeftOnBase":
@@ -327,7 +327,7 @@ export default {
 
                 case "RunBattedIn":
                     result[athlete_index].runBattedIn++;
-                    result[athlete_index].run++;
+                    
                     break;
 
                 case "LeftOnBase":
@@ -427,7 +427,7 @@ export default {
 
                 case "RunBattedIn":
                     result[athlete_index].runBattedIn++;
-                    result[athlete_index].run++;
+                    
                     break;
 
                 case "LeftOnBase":

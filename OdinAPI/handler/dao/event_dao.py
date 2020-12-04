@@ -1,6 +1,7 @@
 from .config.sqlconfig import db_config
 from flask import jsonify
 import psycopg2
+from datetime import datetime
 
 
 class EventDAO:
@@ -51,6 +52,36 @@ class EventDAO:
         except Exception as e:
             print(e)
             return "Occurrió un error interno tratando de buscar todos los eventos."    
+        finally:
+            if self.conn is not None:
+                self._closeConnection()
+        return result
+
+    def get_events_in_24_hours(self):
+        cursor = self.conn.cursor()
+
+        moment = datetime.now()
+
+        query = """select id, event_date, is_local, venue, team_id, opponent_name, event_summary
+                   from event
+                   where is_invalid=false
+                   and event_date > %s::timestamp + '1 day'::INTERVAL
+                   and event_date < %s::timestamp + '1 day'::INTERVAL + '35 minutes'::INTERVAL
+                """
+        result = None
+        try:
+            cursor.execute(query, (moment, moment))
+            result = []  # Will contain the event records
+            for row in cursor:
+                result.append(row)
+
+            if not result:  # No valid event exist
+                return None
+
+            cursor.close()
+        except Exception as e:
+            print(e)
+            return "Occurrió un error interno tratando de buscar todos los eventos."
         finally:
             if self.conn is not None:
                 self._closeConnection()

@@ -6,7 +6,7 @@ export default {
     async handleSetScores({ commit, dispatch }, event_id) {
         try {
 
-            for (let i = 1; i <= 9; i++) {
+            for (let i = 1; i <= 19; i++) {
                 // Async functions for UPRM scores.
                 await rtdb().ref("/v1/" + event_id + "/score/set" + i + "-uprm").on('value', function (snapshot) {
                     let entry = { set: i, score: snapshot.val() };

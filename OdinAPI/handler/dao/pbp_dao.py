@@ -218,6 +218,32 @@ class PBPDao:
             str(int(event_id)) + self._db_keywords["meta"]
         return self._rtdb.reference(path).get()
 
+    def set_current_set_baseball(self, event_id, new_set,otuprm,otopp):
+        """
+        Updates the current set or period for a PBP sequence.
+        This function sets the current set or period value of a PBP sequence given its id.
+
+        Args
+            event_id: integer corresponding to an event id.
+            new_set: integer corresponding to the new set or period value.
+
+        Returns:
+            void
+        """
+
+        path = self._db_keywords["root"] + \
+               str(int(event_id)) + self._db_keywords["set"]
+        self._rtdb.reference(path).set(int(new_set))
+
+        if new_set > 9:
+            temp = {
+                otuprm: 0,
+                otopp: 0
+            }
+            path = self._db_keywords["root"] + str(int(event_id)) + '/' + self._db_keywords["score-key"]
+            self._rtdb.reference(path).update(temp)
+
+
     def set_current_set_basketball(self, event_id, new_set,otuprm,otopp):
         """
         Updates the current set or period for a PBP sequence.
@@ -239,11 +265,13 @@ class PBPDao:
             temp= {
                 otuprm:0,
                 otopp:0
+
             }
-
-
-            path = self._db_keywords["root"] + str(int(event_id))+'/'+self._db_keywords["score-key"]
+            path = self._db_keywords["root"] + str(int(event_id)) + '/' + self._db_keywords["score-key"]
             self._rtdb.reference(path).update(temp)
+
+
+
 
     def set_current_set(self, event_id,new_set):
         """

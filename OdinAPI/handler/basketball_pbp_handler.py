@@ -151,11 +151,6 @@ class BasketballPBPHandler:
             dao.add_pbp_game_action(event_id, action)
             return
 
-        # At this point, the remaining valid actions must have 3 arguments.
-        if len(action) != 4:
-            raise Exception(
-                "El número de argumentos esperado es 4.")
-
         # Adjust game actions modify the score of the direct team indicated in action["team"].
         # These are not added to the notifications feed (non-relational database).
         if action_type == self._sport_keywords["adjust"]:
@@ -652,9 +647,12 @@ class BasketballPBPHandler:
             current_set = pbp_dao.get_current_set(event_id)
             if current_set>4 and adjust==-1:
                 return jsonify(Error="El partido se encuentra en tiempo extra."), 403
+            if current_set>9:
+                return jsonify(Error="El sistema solo tiene 6 tiempos extras."), 403
             potential_set = current_set + adjust
             otuprm=""
             otopp=""
+
             if potential_set > 4 or potential_set < 1:
                 otuprm="quater"+str(potential_set)+"-uprm"
                 otopp="quater"+str(potential_set)+"-opponent"

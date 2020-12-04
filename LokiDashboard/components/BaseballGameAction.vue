@@ -304,10 +304,8 @@ export default {
 
     plays: [
       "Hit",
-      "At Bat",
-      "Homerun",
-      "Strike",
-      "Bola",
+      "Al Bate",
+      "Cuadrangular",
       "Out",
       "Carrera",
       "Carrera Empujada",
@@ -351,8 +349,8 @@ export default {
   }),
   methods: {
     ...mapActions({
-      updateGameAction: "baseballPBP/updateGameAction",
-      removeGameAction: "baseballPBP/removeGameAction"
+      updateGameAction: "BaseballPBP/updateGameAction",
+      removeGameAction: "BaseballPBP/removeGameAction"
     }),
 
     // Setup v-models for editting a notification.
@@ -488,45 +486,7 @@ export default {
       this.button_loading = false;
     },
 
-    map_action(action_name) {
-      switch (action_name) {
-        case "Notification":
-          return "Notificación";
-
-        case "KillPoint":
-          return "Punto de Ataque";
-
-        case "Ace":
-          return "Servicio Directo";
-
-        case "BlockPoint":
-          return "Punto de Bloqueo";
-
-        case "Assist":
-          return "Asistencia";
-
-        case "Block":
-          return "Bloqueo";
-
-        case "Dig":
-          return "Recepción";
-
-        case "AttackError":
-          return "Error de Ataque";
-
-        case "ServiceError":
-          return "Error de Servicio";
-
-        case "BlockingError":
-          return "Error de Bloqueo";
-
-        case "ReceptionError":
-          return "Error de Recepción";
-
-        default:
-          return "Acción Desconocida";
-      }
-    },
+    
 
     // Given an item (UPRM ATHLETE), return its name.
     get_uprm_item_text(item) {

@@ -135,11 +135,6 @@ class SoccerPBPHandler:
             dao.add_pbp_game_action(event_id, action)
             return
 
-        # At this point, the remaining valid actions must have 3 arguments.
-        if len(action) != 4:
-            raise Exception(
-                "El número de argumentos esperado es 4.")
-
         # Adjust game actions modify the score of the direct team indicated in action["team"].
         # These are not added to the notifications feed (non-relational database).
         if action_type == self._sport_keywords["adjust"]:
@@ -264,8 +259,7 @@ class SoccerPBPHandler:
             raise Exception(
                 "Las notificaciones no pueden cambiar de tipo.")
 
-        if len(new_action) != 4:
-            raise Exception("Las jugadas deben tener 4 parámetros.")
+
 
         # From now on, the remaining game actions involve game plays.
         # Plays require values for team and athlete_id.

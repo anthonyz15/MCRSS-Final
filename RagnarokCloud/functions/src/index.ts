@@ -118,13 +118,14 @@ export class BaseballStatsEntry {
 }
 
 export const enum BaseballPlays {
-    AtBats = "Atbats",
-    Runs = "Runs",
-    Hits = "Hits",
-    Runs_batted_in = "Runs_batted_in",
-    Base_on_balls = "BaseOnBalls",
-    Strikeouts = "Strikeouts",
-    Left_on_base = "LeftOnBase"
+    AtBats = "AtBat",
+    Runs = "Run",
+    Hits = "Hit",
+    Runs_batted_in = "RunBattedIn",
+    Base_on_balls = "BaseOnBall",
+    Strikeouts = "StrikeOut",
+    Left_on_base = "LeftOnBase",
+    Homerun = "Homerun"
     
 }
 
@@ -169,12 +170,68 @@ export const updateBaseballStats = function (actionType: string, playerStats:
             playerStats.leftOnBase();
             teamStats.leftOnBase();
             break;
+        case BaseballPlays.Homerun:
+            playerStats.Runs();
+            teamStats.Runs();
+            playerStats.Hits();
+            teamStats.Hits();
+            break;
         default:
             console.log("BaseballGameSync Error: Non-statistics current action " + actionType);
             break;
     }
 
     return;
+}
+
+export const postSoftballResults = async function (gameStatistics: JSON) {
+    // Prepare for POST request to Odin API with Baseball results.	
+    const BaseballPath = "https://white-smile-272204.ue.r.appspot.com/results/baseball/";
+    // Handling permissions as required for using Odin API.
+    const permissions = [
+        { "13": false },
+        { "14": false },
+        { "15": false },
+        { "16": false },
+        { "17": false },
+        { "18": false },
+        { "19": true },
+        { "20": false },
+        { "21": false },
+        { "22": false },
+        { "23": false },
+        { "24": false },
+        { "25": false },
+        { "26": false },
+        { "27": false }
+    ];
+
+    const payload = {
+        'permissions': permissions,
+    }
+
+    const algorithm: TAlgorithm = "HS256";
+    const SECRET_KEY: string = "Ni_El_Corona_Puede_Conmigo";
+
+    let token: string = encode(payload, SECRET_KEY, algorithm);
+
+    // Given the token, send statistics to Odin API.	
+    await axios({
+        method: 'post',
+        url: BaseballPath,
+        responseType: 'application/json',
+        data: gameStatistics,
+        headers: {
+            'Authorization': "Bearer " + token
+        }
+    }).then(function (response: any) {
+        console.log(response.data);
+        return true;
+    }).catch((error: any) => {
+        console.log("postSoftballResults posting results error: " + error);
+    });
+
+    return false;
 }
 
 export const postBaseballResults = async function (gameStatistics: JSON) {
@@ -934,6 +991,7 @@ export const PBPGameSync = functions.database.ref("/v1/{game_id}/game-metadata/g
 
         // Obtain the sport value from game metadata.	
         await admin.database().ref("/v1/" + gameId + "/game-metadata/sport").once('value').then((snapshot) => {
+            
             sport = snapshot.val();
         }).catch(() => {
             console.log("PBPGameSync Errpr: could not retrieve sport from game metadata.");
@@ -944,8 +1002,8 @@ export const PBPGameSync = functions.database.ref("/v1/{game_id}/game-metadata/g
         // Note: Even though for this phase only volleyball is implemented,	
         //       it is important to validate that the sport is volleyball.	
         //       This way, this function can work when other sports are added.	
-        if (sport !== "Voleibol" && sport !=="Baloncesto" && sport !=="Futbol" && sport !=="Beisbol") {
-            console.log("PBPGameSync Error: Not a volleyball game! (" + sport + ")");
+        if (sport !== "Voleibol" && sport !=="Baloncesto" && sport !=="Futbol" && sport !=="Softbol" && sport !=="Beisbol"  ) {
+            console.log("PBPGameSync Error: Not a pbp game! (" + sport + ")");
             return null;
         }
         
@@ -1329,7 +1387,6 @@ export const PBPGameSync = functions.database.ref("/v1/{game_id}/game-metadata/g
             // End of PBPGameSync process.	
             return;
         }
-
         else if (sport=="Beisbol"){
             // Obtain game score by each team.
             let uprmScore: number = 0;
@@ -1456,7 +1513,135 @@ export const PBPGameSync = functions.database.ref("/v1/{game_id}/game-metadata/g
             // End of PBPGameSync process.	
             return;
         }
+        else if (sport=="Softbol"){
+            // Obtain game score by each team.
+            let uprmScore: number = 0;
+            let opponentScore: number = 0;
 
+            await admin.database().ref("/v1/" + gameId + "/score").once('value').then((snapshot) => {
+                // Find the score on each quarter and calculate the number of quarter won by each team.	
+                for (let i = 1; i <= 25; i++) {
+
+                    const uprmPoints: number = snapshot.child("set" + i + "-uprm").val();
+                    const opponentPoints: number = snapshot.child("set" + i + "-opponent").val();
+
+                    uprmScore+=uprmPoints;
+
+                    opponentScore+=opponentPoints;
+                }
+                console.log(opponentScore);
+                console.log(uprmScore);
+            }).catch(() => {
+                console.log("PBPGameSync Error: Unable to retrieve score.");
+                return null;
+            });
+
+            // If the game is marked as over and is a volleyball game, start sync process.	
+
+            /*	
+                <Section 2>	
+                    This section represents the first process block of the flowchart in which	
+                    uprm-player-stats (uprmPlayerStats in code) and uprm-stats (uprmStats) are	
+                    initialized. Note that in this implementation, when the game actions are	
+                    retrieved, uprmPlayerStats and uprmStats collections are being modified.	
+            */
+
+            //Initialize Variables.	
+            let uprmPlayerStats: BaseballStatsEntry[] = [];
+            let uprmPlayerKeys: string[] = [];
+            let uprmStats: BaseballStatsEntry = new BaseballStatsEntry();
+
+            // Retrieve UPRM roster from RTDB.	
+            await admin.database().ref("/v1/" + gameId + "/uprm-roster").once('value').then((snapshot) => {
+                // Insert athlete VolleyballStatsEntry into the uprmPlayerStats map.	
+                snapshot.forEach((athleteSnap) => {
+                    const athleteKey: string = <string>athleteSnap.child("athlete_id").val();
+                    uprmPlayerKeys.push(athleteKey);
+                    uprmPlayerStats.push(new BaseballStatsEntry());
+                });
+            }).catch(() => {
+                console.log("PBPGameSync Error: Unable to retrieve UPRM roster.");
+                return null;
+            });
+
+            console.log(uprmPlayerStats);
+
+            // Retrieve game actions and per each game action modify uprmPlayerStats and uprmStats.	
+            // The conditional branches in the following code segment follow the flowchart for the	
+            // Volleyball Game Sync process specified in progress report #1 for MJOLNIR.	
+            await admin.database().ref("/v1/" + gameId + "/game-actions").once('value').then((snapshot) => {
+                // Update uprmPlayerStats and uprmStats based on each volleyball play (from game actions).	
+                snapshot.forEach((gameAction) => {
+
+                    const actionType: string = <string>gameAction.child("action_type").val();
+
+                    // Update statistics only if it is a play corresponding to UPRM team.	
+                    if (actionType !== "Notification") {
+                        const team: string = <string>gameAction.child("team").val();
+
+                        if (team === "uprm") {
+                            const player: string = <string>gameAction.child("athlete_id").val();
+                            let index = -1;
+                            for (let i = 0; i < uprmPlayerKeys.length; i++) {
+                                if (uprmPlayerKeys[i] == player) {
+                                    index = i;
+                                }
+                            }
+                            if (index >= 0) {
+                                updateBaseballStats(actionType, uprmPlayerStats[index], uprmStats);
+                            } else {
+                                console.log("ATHLETE NOT FOUND " + player);
+                            }
+                        }
+                    }
+                });
+            }).catch(() => {
+                console.log("PBPGameSync Error: Unable to retrieve game actions.");
+                return null;
+            });
+
+            // Prepare uprmPlayerStats to be added into the request payload.	
+            let athleteStats: any = [];
+            for (let i = 0; i < uprmPlayerKeys.length; i++) {
+                athleteStats.push(
+                    {
+                        "athlete_id": uprmPlayerKeys[i],
+                        "statistics": uprmPlayerStats[i].getJSON()
+                    }
+                );
+            }
+
+            /*	
+                <Section 3>	
+                    In this section, all the statistics have been calculated. The only	
+                    missing task is to build the JSON payload and send the HTTPS request	
+                    to Odin API.	
+            */
+
+            // Prepare payload.	
+            const gameStatistics = <JSON><unknown>{
+                "event_id": gameId.toString(),
+                "team_statistics": uprmStats.getJSON(),
+                "athlete_statistics": athleteStats,
+                "uprm_score": uprmScore,
+                "opponent_score": opponentScore
+            };
+
+            console.log(gameStatistics);
+
+            //Send game statistics to Odin API.	
+            postSoftballResults(gameStatistics).then(() => {
+                console.log("POSTED");
+            }).catch(error => {
+                console.log(error);
+            })
+
+            // End of PBPGameSync process.	
+            return;
+        }
+
+
+        
         else{
             return;
         }

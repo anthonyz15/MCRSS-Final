@@ -2,6 +2,8 @@ from flask import jsonify
 from .dao.event_dao import EventDAO
 from .dao.pbp_dao import PBPDao
 from dateutil.parser import parse
+from handler.notifications_handler import NotificationHandler
+from datetime import datetime
 import re
 
 class EventHandler:
@@ -220,6 +222,7 @@ class EventHandler:
         dao = None
         try:   
             dao = EventDAO()
+            handleNotification = NotificationHandler()
             attributesValidation = self.validateAttributes(attributes)
 
             if isinstance(attributesValidation,str):
@@ -230,11 +233,15 @@ class EventHandler:
                 dao._closeConnection()
                 return jsonify(Error = "Equipo no existe con el identificador:{}".format(tID)),404
 
+
             result = dao.addEvent(tID,attributes['event_date'],attributes['is_local'],attributes['venue'],attributes['opponent_name'],attributes['event_summary'])
 
             if isinstance(result,str):
                 dao._closeConnection()
                 return jsonify(Error = result),500
+
+            if (parse(attributes['event_date']).date() == datetime.now().date()):
+                handleNotification.send_notification_to_all(f"UPRM vs {attributes['opponent_name']}",f"Hoy en {attributes['venue']}")
 
             event = dao.getEventByID(result)
             mappedEvent = self.mapEventToDict(event)

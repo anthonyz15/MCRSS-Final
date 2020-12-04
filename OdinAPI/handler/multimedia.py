@@ -1,6 +1,7 @@
 from flask import jsonify
 from .dao.multimedia_dao import MultimediaDAO
 from .dao.user_dao import UserDAO
+from handler.notifications_handler import NotificationHandler
 
 class MultimediaHandler:
     
@@ -44,10 +45,13 @@ class MultimediaHandler:
             return jsonify(Error = validationResult), 400
 
         dao = MultimediaDAO()
+        handleNotification= NotificationHandler()
 
         try:
             #Add multimedia post using DAO
             result = dao.addMultimedia(attributes['title'], attributes['content'], attributes['type'], attributes['duid'])
+            if (attributes['type'] == 'livestream'):
+                handleNotification.send_notification_to_all('En Vivo', attributes['title'])
 
             #Fetch newly created multimedia post by its id to return
             multimedia = dao.getMultimediaByID(result)

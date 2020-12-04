@@ -203,7 +203,14 @@
                           <th  class="text-center" v-if="currentSet > 10">ENTRADA 11 </th>
                           <th  class="text-center" v-if="currentSet > 11">ENTRADA 12 </th>
                           <th  class="text-center" v-if="currentSet > 12">ENTRADA 13 </th>
-                          <th class="text-center">FINAL</th>
+                          <th  class="text-center" v-if="currentSet > 13">ENTRADA 14 </th>
+                          <th  class="text-center" v-if="currentSet > 14">ENTRADA 15 </th>
+                          <th  class="text-center" v-if="currentSet > 15">ENTRADA 16 </th>
+                          <th  class="text-center" v-if="currentSet > 16">ENTRADA 17 </th>
+                          <th  class="text-center" v-if="currentSet > 17">ENTRADA 18 </th>
+                          <th  class="text-center" v-if="currentSet > 18">ENTRADA 19 </th>
+
+                  
                         </tr>
                       </thead>
                       <tbody>
@@ -214,7 +221,14 @@
                           <td  class="text-center" v-if="currentSet > 10">{{ uprmSets[10]}} </td>
                           <td  class="text-center" v-if="currentSet > 11">{{ uprmSets[11]}} </td>
                           <td  class="text-center" v-if="currentSet > 12">{{ uprmSets[12]}} </td>
-                          <!-- <td class="text-center">{{}}</td> -->
+                          <td  class="text-center" v-if="currentSet > 13">{{ uprmSets[13]}}</td>
+                          <td  class="text-center" v-if="currentSet > 14">{{ uprmSets[14]}} </td>
+                          <td  class="text-center" v-if="currentSet > 15">{{ uprmSets[15]}} </td>
+                          <td  class="text-center" v-if="currentSet > 16">{{ uprmSets[16]}} </td>
+                          <td  class="text-center" v-if="currentSet > 17">{{ uprmSets[17]}}</td>
+                          <td  class="text-center" v-if="currentSet > 18">{{ uprmSets[18]}} </td>
+                      
+                          
                         </tr>
                         <tr :key="2526">
                           <td class="text-center">{{ opponentName }}</td>
@@ -223,7 +237,14 @@
                           <td  class="text-center" v-if="currentSet > 10">{{ oppSets[10]}} </td>
                           <td  class="text-center" v-if="currentSet > 11">{{ oppSets[11]}} </td>
                           <td  class="text-center" v-if="currentSet > 12">{{ oppSets[12]}} </td>
-                          <!-- <td  class="text-center">{{}}</td> -->
+                          <td  class="text-center" v-if="currentSet > 13">{{ oppSets[13]}}</td>
+                          <td  class="text-center" v-if="currentSet > 14">{{ oppSets[14]}} </td>
+                          <td  class="text-center" v-if="currentSet > 15">{{ oppSets[15]}} </td>
+                          <td  class="text-center" v-if="currentSet > 16">{{ oppSets[16]}} </td>
+                          <td  class="text-center" v-if="currentSet > 17">{{ oppSets[17]}}</td>
+                          <td  class="text-center" v-if="currentSet > 18">{{ oppSets[18]}} </td>
+                        
+                          
                         </tr>
                       </tbody>
                     </template>
