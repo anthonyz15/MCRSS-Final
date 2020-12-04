@@ -1,12 +1,12 @@
 /**
- * Vuex store for about us, with actions, mutations, getters and state.
+ * Vuex store for about us, with actions, mutations, getters, and state.
  * @module aboutus
  */
 
 export default {
 
     /**
-     * Action to fetch all about us instances from the database
+     * Action to fetch all about us elements from the database
      * @param {*} param0  destructuring of vuex context object
      */
     async getAboutUs({ commit, dispatch }) {
@@ -28,9 +28,9 @@ export default {
     },
 
     /**
-     * Action to fetch multimedia post by their type from the database.
+     * Action to fetch about us elements by their type from the database.
      * @param {*} param0 destructuring of vuex context object
-     * @param {*} type type of the multimedia posts being fetched
+     * @param {*} type type of the about us element being fetched
      */
     async getAboutUsByType({ commit, dispatch }, type) {
         try {
@@ -50,10 +50,10 @@ export default {
     },
 
     /**
-     * Action to add a new multimedia post to the system given the information
-     * in the multimedia post creation form
+     * Action to add a new about us element to the system given the information
+     * in the about us creation form
      * @param {*} param0 destructuring of vuex context object
-     * @param {*} aboutusJSON Object containing the information of the multimedia post to be added.
+     * @param {*} aboutusJSON Object containing the information of the about us element to be added.
      */
     async addAboutUs({ commit, dispatch }, aboutusJSON) {
         try {
@@ -72,10 +72,10 @@ export default {
     },
 
     /**
-     * Action to edit a multimedia post's information by their id and information given
-     * in the multimedia post edit form.
+     * Action to edit a about us element's information by their id and information given
+     * in the about us edit form.
      * @param {*} param0 destructuring of vuex context object
-     * @param {*} aboutusJSON Object containing the information of the multimedia post to be edited.
+     * @param {*} aboutusJSON Object containing the information of the about us element to be edited.
      */
     async editAboutUs({ commit, dispatch }, aboutusJSON) {
         try {
@@ -96,9 +96,9 @@ export default {
     },
 
     /**
-     * Action to remove a multimedia post from the system given their id.
+     * Action to remove an about us element from the system given their id.
      * @param {*} param0 destructuring of vuex context object
-     * @param {*} hdid id of the multimedia post being removed
+     * @param {*} hdid id of the about us element being removed
      */
     async removeAboutUs({ commit, dispatch }, hdid) {
         try {
@@ -117,4 +117,3 @@ export default {
         }
     },
 }
-
