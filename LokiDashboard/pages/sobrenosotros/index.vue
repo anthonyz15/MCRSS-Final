@@ -1,88 +1,84 @@
 <template>
   <v-container class="wrapper">
     <h1 class="primary_dark--text pl-3">Sobre Nosotros</h1>
-    
     <div class="content-area pa-4 pt-12">
-        <v-card>
-            <v-card-title>Descripción
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
+      <v-card>
+        <v-card-title>Descripción
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2 table-actions"
+                v-on="on"
+                @click="editDescription()"
+                :disabled="!$store.state.userAuth.userPermissions[20]['33']"
+              >mdi-pencil</v-icon>
+            </template>
+            <span>Editar Descripción</span>
+          </v-tooltip>
+        </v-card-title>
+        <v-card-text>{{getDescription()}}</v-card-text>
+      </v-card>
+    </div>
+
+    <div class="content-area pa-4 pt-12">
+    <v-card>
+      <v-card-title>Capitán</v-card-title>
+        <v-data-table
+          :headers="headers"
+          :items="getCaptain()"
+          :search="search"
+          :loading="loadingAboutUs()"
+          class="elevation-1" 
+          no-data-text="No hay información Sobre Nosotros."
+          loading-text="Buscando información Sobre Nosotros."
+          no-results-text="No se encontró ninguna información Sobre Nosotros."
+        >
+          <template v-slot:item="{ item }">
+            <tr>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdid}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdmember}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.title}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.major}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.picture}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
                     <v-icon
-                        medium
-                        class="mr-2 table-actions"
-                        v-on="on"
-                        @click="editDescription()"
-                        :disabled="!$store.state.userAuth.userPermissions[20]['33']"
+                      medium
+                      class="mr-2 table-actions"
+                      v-on="on"
+                      @click="viewMember(item)"
+                    >mdi-eye-plus</v-icon>
+                  </template>
+                  <span>Ver Capitán</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      medium
+                      class="mr-2 table-actions"
+                      v-on="on"
+                      @click="editMember(item)"
+                      :disabled="!$store.state.userAuth.userPermissions[20]['33']"
                     >mdi-pencil</v-icon>
-                </template>
-                <span>Editar Descripción</span>
-            </v-tooltip>
-            </v-card-title>
-            <v-card-text>{{getDescription()}}</v-card-text>
-        </v-card>
+                  </template>
+                  <span>Editar Capitán</span>
+                </v-tooltip>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-card>
     </div>
 
     <div class="content-area pa-4 pt-12">
-    <v-card>
-
-        <v-card-title>Capitán</v-card-title>
-            <v-data-table
-            :headers="headers"
-            :items="getCaptain()"
-            :search="search"
-            :loading="loadingAboutUs()"
-            class="elevation-1" 
-            no-data-text="No hay información Sobre Nosotros."
-            loading-text="Buscando información Sobre Nosotros."
-            no-results-text="No se encontró ninguna información Sobre Nosotros."
-            >
-                <template v-slot:item="{ item }">
-                    <tr>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdid}}</td>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdmember}}</td>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.title}}</td>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.major}}</td>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.picture}}</td>
-                        <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon
-                                medium
-                                class="mr-2 table-actions"
-                                v-on="on"
-                                @click="viewMember(item)"
-                                >mdi-eye-plus</v-icon>
-                            </template>
-                            <span>Ver Capitán</span>
-                            </v-tooltip>
-
-                            <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon
-                                medium
-                                class="mr-2 table-actions"
-                                v-on="on"
-                                @click="editMember(item)"
-                                :disabled="!$store.state.userAuth.userPermissions[20]['33']"
-                                >mdi-pencil</v-icon>
-                            </template>
-                            <span>Editar Capitán</span>
-                            </v-tooltip>
-                        </td>
-                    </tr>
-                </template>
-            </v-data-table>
-        </v-card>
-    </div>
-
-    <div class="content-area pa-4 pt-12">
-    <v-card>
-
+      <v-card>
         <v-card-title>Miembros</v-card-title>
         <v-card-title>
           <v-row>
             <v-col>
-
               <v-btn
                 color="primary_light"
                 class="white--text"
@@ -92,10 +88,9 @@
                 <v-icon left>mdi-plus</v-icon>Añadir Miembro
               </v-btn>
               <v-spacer />
-
             </v-col>
+            
             <v-col cols="4">
-
               <v-text-field
                 v-model="search"
                 append-icon="mdi-magnify"
@@ -106,11 +101,9 @@
                 single-line
                 hide-details
               />
-
             </v-col>
           </v-row>
         </v-card-title>
-        
         
         <v-data-table
           :headers="headers"
@@ -122,82 +115,85 @@
           loading-text="Buscando información Sobre Nosotros."
           no-results-text="No se encontró ninguna información Sobre Nosotros."
         >
-            <template v-slot:item="{ item }">
-                <tr>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdid}}</td>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdmember}}</td>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.title}}</td>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.major}}</td>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.picture}}</td>
-                    <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon
-                            medium
-                            class="mr-2 table-actions"
-                            v-on="on"
-                            @click="viewMember(item)"
-                            >mdi-eye-plus</v-icon>
-                        </template>
-                        <span>Ver Miembro</span>
-                        </v-tooltip>
+          <template v-slot:item="{ item }">
+            <tr>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdid}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.hdmember}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.title}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.major}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{item.picture}}</td>
+              <td style="max-width: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      medium
+                      class="mr-2 table-actions"
+                      v-on="on"
+                      @click="viewMember(item)"
+                    >mdi-eye-plus</v-icon>
+                  </template>
+                  <span>Ver Miembro</span>
+                </v-tooltip>
 
-                        <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon
-                            medium
-                            class="mr-2 table-actions"
-                            v-on="on"
-                            @click="editMember(item)"
-                            :disabled="!$store.state.userAuth.userPermissions[20]['33']"
-                            >mdi-pencil</v-icon>
-                        </template>
-                        <span>Editar Miembro</span>
-                        </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-icon
+                      medium
+                      class="mr-2 table-actions"
+                      v-on="on"
+                      @click="editMember(item)"
+                      :disabled="!$store.state.userAuth.userPermissions[20]['33']"
+                    >mdi-pencil</v-icon>
+                  </template>
+                  <span>Editar Miembro</span>
+                </v-tooltip>
 
-                        <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon
-                                medium
-                                class="mr-2 table-actions"
-                                v-on="on"
-                                @click="deleteMember(item.hdid)"
-                                :disabled="!$store.state.userAuth.userPermissions[19]['32']"
-                                >mdi-delete</v-icon>
-                        </template>
-                        <span>Borrar Miembro</span>
-                        </v-tooltip>
-                    </td>
-                </tr>
-            </template>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                      <v-icon
+                        medium
+                        class="mr-2 table-actions"
+                        v-on="on"
+                        @click="deleteMember(item.hdid)"
+                        :disabled="!$store.state.userAuth.userPermissions[19]['32']"
+                      >mdi-delete</v-icon>
+                  </template>
+                  <span>Borrar Miembro</span>
+                </v-tooltip>
+              </td>
+            </tr>
+          </template>
         </v-data-table>
 
         <AddMemberModal 
-            :dialog.sync="dialogAddMember" 
+          :dialog.sync="dialogAddMember" 
         />
 
         <ViewMemberModal
-            :dialog.sync="dialogViewMember"
-            :member="selectedMember.member"
-            :title="selectedMember.title"
-            :major="selectedMember.major"
-            :picture="selectedMember.picture"
+          :dialog.sync="dialogViewMember"
+          :member="selectedMember.member"
+          :title="selectedMember.title"
+          :major="selectedMember.major"
+          :picture="selectedMember.picture"
+        />
+
+         <EditMemberModal
+          :dialog.sync="dialogEditMember"
+          :hdid="editedMember.hdid"
+          :member="editedMember.member"
+          :title="editedMember.title"
+          :major="editedMember.major"
+          :picture="editedMember.picture"
         />
 
         <EditAboutUsDescriptionModal
-            :dialog.sync="dialogEditDescription"
+          :dialog.sync="dialogEditDescription"
         />
 
-        <EditMemberModal
-            :dialog.sync="dialogEditMember"
-            :hdid="editedMember.hdid"
-            :member="editedMember.member"
-            :title="editedMember.title"
-            :major="editedMember.major"
-            :picture="editedMember.picture"
+        <DeleteMemberModal 
+          :dialog.sync="dialogDeleteMember" 
+          :id="hdid" 
         />
-
-        <DeleteMemberModal :dialog.sync="dialogDeleteMember" :id="hdid" />
     
       </v-card>
     </div>
@@ -211,7 +207,6 @@ import ViewMemberModal from "@/components/ViewMemberModal";
 import EditMemberModal from "@/components/EditMemberModal";
 import DeleteMemberModal from "@/components/DeleteMemberModal";
 import EditAboutUsDescriptionModal from "@/components/EditAboutUsDescriptionModal";
-
 
 export default {
   components: {
@@ -231,7 +226,6 @@ export default {
         dialogEditMember: false,
         dialogDeleteMember: false,
         dialogEditDescription: false,
-        
         terms: false,
         ready: false,
 
@@ -271,8 +265,8 @@ export default {
     }),
 
     /**
-     * Return false if multimedia posts have been loaded,
-     * false otherwise.
+     * Return false if about us elements have been loaded,
+     * true otherwise.
      */
     loadingAboutUs(){
       if(this.aboutuss.length > 0){
@@ -282,40 +276,55 @@ export default {
       }
     },
 
+    /**
+     * Activates the AddMemberModal dialog.
+     */
     addMember() {
         this.dialogAddMember = true
     },
 
+    /**
+     * Activates the ViewMemberModal dialogand prepares
+     * the about us member to view using the about us member object given 
+     * as parameter.
+     * @param member Object containing information of the about us member to view.
+     */
     viewMember(member){
       this.selectedMember = Object.assign({}, member)
       this.dialogViewMember = true
     },
 
     /**
-     * Activates the EditMultimediaModal and prepares
-     * the multimedia post to edit using the multimedia object given 
+     * Activates the EditMemberModal dialog and prepares
+     * the about us member to edit using the about us member object given 
      * as parameter
-     * @param member Object containing the information of the multimedia post to edit.
+     * @param member Object containing the information of the about us member to edit.
      */
     editMember(member){
       this.editedMember = Object.assign({}, member)
       this.dialogEditMember = true
     },  
 
+    /**
+     * Activates the EditAboutUsDescriptionModal dialog.
+     */
     editDescription(){
       this.dialogEditDescription = true
     }, 
 
     /**
-     * Activates the DeleteMultimediaModal using 
-     * the id of the multimedia given as parameter.
-     * @param memberID id of the multimedia to remove.
+     * Activates the DeleteMemberModal dialog using 
+     * the id of the about us member given as parameter.
+     * @param memberID id of the about us member to remove.
      */
     deleteMember(memberID){
       this.hdid = memberID
       this.dialogDeleteMember = true
     },
 
+    /**
+     * Returns the about us description.
+     */
     getDescription() {
         let description = this.aboutuss.find(aboutus => aboutus.type === 'description')
         if(description != null) {
@@ -323,6 +332,9 @@ export default {
         }
     },
 
+    /**
+     * Returns the about us captain.
+     */
     getCaptain() {
         let captains = []
         let captain = this.aboutuss.find(aboutus => aboutus.type === 'captain')
@@ -332,6 +344,9 @@ export default {
         }
     },
 
+    /**
+     * Returns a list of the about us members
+     */
     getMembers() {
         let members = []
         for(let i = 0; i < this.aboutuss.length; i++) {
@@ -341,7 +356,6 @@ export default {
         }
         return members
     }
-
   },
 
   computed: {
