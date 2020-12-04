@@ -47,6 +47,9 @@ export default {
     },
 
     methods: {
+        /**
+        * Closes the ViewMemberModal dialog.
+        */
         close() {
             this.$emit("update:dialog", false)
         }
