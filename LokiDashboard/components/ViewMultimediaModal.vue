@@ -76,6 +76,10 @@
     }),
 
     methods: {
+
+        /**
+        *Formats the date and time for the card.
+        */
         formatDate() {
             let mDate = new Date(Date.parse(this.date_published));
             let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -83,10 +87,16 @@
             return date
         },
 
+        /**
+        *Truncates the content text when larger than 477 characters.
+        */
         truncate(value) {
             return value.substring(0, 477) + '...';
         },
         
+        /**
+        * Closes the ViewMultimediaModal dialog.
+        */
         close() {
             this.truncated = true
             this.$emit("update:dialog", false)
