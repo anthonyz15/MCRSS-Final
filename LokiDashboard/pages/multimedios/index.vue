@@ -4,10 +4,8 @@
     <div class="content-area pa-4 pt-12">
       <v-card>
         <v-card-title>
-          
           <v-row>
             <v-col>
-
               <v-btn
                 color="primary_light"
                 class="white--text"
@@ -17,10 +15,9 @@
                 <v-icon left>mdi-plus</v-icon>Añadir Publicación
               </v-btn>
               <v-spacer />
-
             </v-col>
-            <v-col cols="4">
 
+            <v-col cols="4">
               <v-text-field
                 v-model="search"
                 append-icon="mdi-magnify"
@@ -31,7 +28,6 @@
                 single-line
                 hide-details
               />
-
             </v-col>
           </v-row>
         </v-card-title>
@@ -118,7 +114,10 @@
           :type="editedItem.type"  
         />
 
-        <DeleteMultimediaModal :dialog.sync="dialogDelete" :id="mid" />
+        <DeleteMultimediaModal 
+          :dialog.sync="dialogDelete" 
+          :id="mid" 
+        />
 
       </v-card>
     </div>
@@ -188,10 +187,16 @@ export default {
       setUser: "userAuth/setUser"
     }),
 
-    formatDate(date) {
-      let mDate = new Date(Date.parse(date));
-      let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      return mDate.toLocaleDateString('es', options);
+    /**
+     * Return false if multimedia posts have been loaded,
+     * true otherwise.
+     */
+    loadingMultimedias(){
+      if(this.multimedias.length > 0){
+        return false
+      }else{
+        return true
+      }
     },
 
     /**
@@ -203,21 +208,10 @@ export default {
     },
 
     /**
-     * Return false if multimedia posts have been loaded,
-     * false otherwise.
-     */
-    loadingMultimedias(){
-      if(this.multimedias.length > 0){
-        return false
-      }else{
-        return true
-      }
-    },
-
-    /**
-     * Routes user to the multimedia view page
-     * using the id given as parameter
-     * @param multimedia id of the multimedia post to view
+     * Activates the ViewMultimediaModal dialog and prepares
+     * the multimedia post to view using the multimedia object given 
+     * as parameter.
+     * @param multimedia Object containing information of the multimedia post to view.
      */
     viewMultimedia(multimedia){
       this.selectedItem = Object.assign({}, multimedia)
@@ -225,17 +219,18 @@ export default {
     },
 
     /**
-     * Activates the EditMultimediaModal and prepares
+     * Activates the EditMultimediaModal dialog and prepares
      * the multimedia post to edit using the multimedia object given 
-     * as parameter
+     * as parameter.
      * @param multimedia Object containing the information of the multimedia post to edit.
      */
     editMultimedia(multimedia){
       this.editedItem = Object.assign({}, multimedia)
       this.dialogEdit = true
-    },    
+    }, 
+
     /**
-     * Activates the DeleteMultimediaModal using 
+     * Activates the DeleteMultimediaModal dialog using 
      * the id of the multimedia given as parameter.
      * @param multimediaID id of the multimedia to remove.
      */
@@ -243,7 +238,15 @@ export default {
       this.mid = multimediaID
       this.dialogDelete = true
     },
-  
+
+    /**
+     * Formats the date and time for the card.
+     */
+    formatDate(date) {
+      let mDate = new Date(Date.parse(date));
+      let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      return mDate.toLocaleDateString('es', options);
+    }
   },
 
   computed: {
