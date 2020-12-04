@@ -70,7 +70,7 @@ export default {
     },
 
     /**
-     * Closes the DeleteMultimediaModal
+     * Closes the DeleteMemberModal dialog.
      */
     close() {      
       this.terms = false
