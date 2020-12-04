@@ -1,21 +1,18 @@
 <template>
-    <v-card class="mx-auto" max-width="600" >
+    <v-card class="mx-auto" max-width="600">
             <v-row>
                 <v-col
                     cols="1"
-                    class="ml-5"
                 >
                     <v-avatar
                         size="36px"
-                        
                     >
                         <img
                             src="https://scontent.fsig3-1.fna.fbcdn.net/v/t1.0-9/15032148_1168852516536914_8884572002414323563_n.jpg?_nc_cat=108&ccb=2&_nc_sid=85a577&_nc_ohc=vIb421K_uFAAX_FTP3v&_nc_ht=scontent.fsig3-1.fna&oh=34f0a31329c46d5fa1e98055a0d32d62&oe=5FE71829"
                         />
                     </v-avatar>
                 </v-col>
-                <v-col
-                class="ml-1">
+                <v-col>
                     <strong>Huella Deportiva</br></strong>
                     <small style="color:gray">{{formatDate()}}</small>
                 </v-col>
@@ -92,6 +89,10 @@
     }),
 
     methods: {
+
+        /**
+        *Formats the date and time for the card.
+        */
         formatDate() {
             let mDate = new Date(Date.parse(this.date_published));
             let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -99,6 +100,9 @@
             return date
         },
 
+        /**
+        *Truncates the content text when larger than 477 characters.
+        */
         truncate(value) {
             return value.substring(0, 477) + '...';
         }
