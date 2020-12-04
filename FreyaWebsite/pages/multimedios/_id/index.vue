@@ -8,7 +8,6 @@
             <v-row>
                 <v-col cols="12">
                     <MultimediaCard
-                        :mid="this.mid"
                         :title="this.title"
                         :content="this.content"
                         :type="this.type"
@@ -39,7 +38,6 @@ export default {
     data: () => ({
         ready: false,
         multimediaExists: true,
-        mid: "",
         title: "",
         content: "",
         type: "",
@@ -51,6 +49,13 @@ export default {
             getMultimediaByID: "multimedias/getMultimediaByID"
         }),
 
+        /**
+         * Returns true if the contents of
+         * the multimedia view page have been formatted
+         * false otherwise. If the contents are not
+         * formatted it then proceeds to format the
+         * contents. 
+         */
         async formated() {
             if(this.ready) {
                 return true
@@ -61,7 +66,7 @@ export default {
 					this.ready = true
 					return true
                 }
-                this.mid = this.multimedia.mid
+                
                 this.title = this.multimedia.title
                 this.content = this.multimedia.content
                 this.type = this.multimedia.type
