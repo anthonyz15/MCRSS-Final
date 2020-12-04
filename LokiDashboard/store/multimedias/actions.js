@@ -1,5 +1,5 @@
 /**
- * Vuex store for multimedias, with actions, mutations, getters and state.
+ * Vuex store for multimedias, with actions, mutations, getters, and state.
  * @module multimedias
  */
 
@@ -120,7 +120,7 @@ export default {
     /**
      * Action to remove a multimedia post from the system given their id.
      * @param {*} param0 destructuring of vuex context object
-     * @param {*} mid id of the multimedia post being removed
+     * @param {*} mid id of the multimedia post to be removed
      */
     async removeMultimedia({ commit, dispatch }, mid) {
         try {
@@ -139,4 +139,3 @@ export default {
         }
     },
 }
-
