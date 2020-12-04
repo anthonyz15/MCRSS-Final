@@ -1,15 +1,16 @@
 /**
- * Vuex store for multimedias, with actions, mutations, getters and state.
+ * Vuex store for multimedias, with actions, mutations, getters, and state.
  * @module aboutus
  */
 
 export default() =>({
     /**
-     * Loaded multimedia post
+     * Loaded about us element
      */
-    aboutus: null, //Used in the single multimedia post viewer page.
+
+    aboutus: null, //Used in the single about us element viewer page.
     /**
-     * List of all multimedia posts.
+     * List of all about us elements.
      */
-    aboutuss: [],//Used in in the all multimedia posts viewer page.
+    aboutuss: [],//Used in in the all about us elements viewer page.
 })
