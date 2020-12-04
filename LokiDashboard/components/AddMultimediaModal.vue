@@ -14,37 +14,32 @@
           ></v-progress-linear>	
           <v-spacer />
         </v-toolbar>
+
         <v-tabs fixed-tabs>         
           <v-tab v-model="type" v-on:change="clear(); type = 'text'">Texto</v-tab>
             <v-tab-item>
               <v-card-text>          
                 <v-form v-model="valid" ref="form">
                   <v-container>
-
                     <v-row justify="start">
                       <v-col md="3">
-
                         <h2>Publicación:</h2>
-                        
                       </v-col>
                     </v-row>
 
                     <v-row justify="start">
-                      <v-col md="12">  
-                                  
+                      <v-col md="12">        
                         <v-text-field
                           v-model="title"          
                           :counter="300"
                           label="Título*"              
                           :rules="[required('título'), maxLength('título', 300)]"
                         ></v-text-field> 
-
                       </v-col>
                     </v-row>
 
                     <v-row justify="start">
                       <v-col md="12">
-                        
                         <v-textarea
                           v-model="content"                
                           :counter="63206"
@@ -52,21 +47,17 @@
                           :rules="[required('Contenido'), maxLength('Contenido', 63206)]"
                           solo
                         ></v-textarea> 
-
                       </v-col>
                     </v-row>
 
                     <v-row>
                       <v-col>
-
                         <v-checkbox
                           v-model="terms"
                           label="Estoy de acuerdo con la información provista*."
                         ></v-checkbox>
-
                       </v-col>
                     </v-row> 
-
                   </v-container>
                   <small>*indica un campo requirido</small>
                 </v-form>      
@@ -78,49 +69,40 @@
                 <v-card-text>
                   <v-form v-model="valid" ref="form">
                     <v-container>
-
                       <v-row justify="start">
                         <v-col md="3">
-
                           <h2>Publicación:</h2>
-                      
                         </v-col>
                       </v-row>
                     
                       <v-row justify="start">
                         <v-col md="12"> 
-
                           <v-text-field
                             v-model="title"          
                             :counter="300"
                             label="Título*"              
                             :rules="[required('título'), maxLength('título', 300)]"
                           ></v-text-field> 
-
                         </v-col>
                       </v-row>
 
                       <v-row justify="start">
                         <v-col md="12">
-
                           <v-text-field
                             v-model="content"                
                             label="URL"                    
                             :rules="[required('URL'), maxLength('URL', 63206)]"
                             solo
                           ></v-text-field>  
-
                         </v-col>
                       </v-row>   
 
                       <v-row>
                         <v-col>
-
                           <v-checkbox
                             v-model="terms"
                             label="Estoy de acuerdo con la información provista*."
                           ></v-checkbox>
-
                         </v-col>
                       </v-row>
 
@@ -135,49 +117,40 @@
               <v-card-text>
                 <v-form v-model="valid" ref="form">
                   <v-container>
-
                     <v-row justify="start">
                       <v-col md="3">
-
                         <h2>Publicación:</h2>
-                    
                       </v-col>
                     </v-row>
                   
                     <v-row justify="start">
                       <v-col md="12"> 
-
                         <v-text-field
                           v-model="title"          
                           :counter="300"
                           label="Título*"              
                           :rules="[required('título'), maxLength('título', 300)]"
                         ></v-text-field> 
-
                       </v-col>
                     </v-row>
 
                     <v-row justify="start">
                       <v-col md="12">
-
                         <v-text-field
                           v-model="content"                
                           label="URL"                    
                           :rules="[required('URL'), maxLength('URL', 63206)]"
                           solo
                         ></v-text-field>  
-
                       </v-col>
                     </v-row>   
 
                     <v-row>
                       <v-col>
-
                         <v-checkbox
                           v-model="terms"
                           label="Estoy de acuerdo con la información provista*."
                         ></v-checkbox>
-
                       </v-col>
                     </v-row>
 
@@ -192,49 +165,40 @@
               <v-card-text>
                 <v-form v-model="valid" ref="form">
                   <v-container>
-
                     <v-row justify="start">
                       <v-col md="3">
-
                         <h2>Publicación:</h2>
-                    
                       </v-col>
                     </v-row>
                   
                     <v-row justify="start">
                       <v-col md="12">  
-
                         <v-text-field
                           v-model="title"          
                           :counter="300"
                           label="Título*"              
                           :rules="[required('título'), maxLength('título', 300)]"
                         ></v-text-field>  
-
                       </v-col>
                     </v-row>
 
                     <v-row justify="start">
                       <v-col md="12">
-
                         <v-text-field
                           v-model="content"                
                           label="URL"                    
                           :rules="[required('URL'), maxLength('URL', 63206)]"
                           solo
                         ></v-text-field> 
-
                       </v-col>
                     </v-row>   
 
                     <v-row>
                       <v-col>
-
                         <v-checkbox
                           v-model="terms"
                           label="Estoy de acuerdo con la información provista*."
                         ></v-checkbox>
-                        
                       </v-col>
                     </v-row>
 
@@ -244,6 +208,7 @@
               </v-card-text>
             </v-tab-item> 
         </v-tabs>
+
         <v-card-actions>
           <v-spacer></v-spacer>
             <v-btn 
@@ -271,7 +236,6 @@
 <script>
   import rules from "@/utils/validations"  
   import {mapActions} from "vuex"
-  //import {mapActions,mapGetters} from "vuex"
 
   export default {
     name:"AddMultimediaModal",
@@ -296,9 +260,9 @@
       }),
 
       /**
-       * Function to be called after the user 
-       * has entered valid information in the required
-       * field.
+       * Function to be called after the user has
+       * entered valid information in the required
+       * fields and has agreed to terms.
        */
       async submit () {
         this.adding = true
@@ -320,21 +284,22 @@
       },
 
       /** 
-       * Closes the AddMultimediaModal
+       * Closes the AddMultimediaModal dialog.
        */
       close() {
         this.clear()
         this.$emit("update:dialog", false)
       },
 
+      /**
+       * Clears and resets all fields in the form.
+       */
       clear() {
         this.terms = false
         this.title = ''
         this.content = ''
-        //this.type = ''
         this.$refs.form.resetValidation()
       }
-
     }
   }
 </script>
