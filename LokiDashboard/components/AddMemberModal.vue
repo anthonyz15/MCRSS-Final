@@ -14,15 +14,13 @@
                     ></v-progress-linear>	
                     <v-spacer />
                 </v-toolbar>
+
                 <v-card-text>       
                     <v-form v-model="valid" ref="form">
                         <v-container>
-
                             <v-row justify="start">
                                 <v-col md="3">
-
                                     <h2>Miembro:</h2>
-                        
                                 </v-col>
                             </v-row>
 
@@ -78,6 +76,7 @@
                         <small>*indica un campo requirido</small>
                     </v-form> 
                 </v-card-text>
+
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn 
@@ -103,70 +102,78 @@
 </template>
 
 <script>
-import rules from "@/utils/validations"  
-import {mapActions} from "vuex"
+    import rules from "@/utils/validations"  
+    import {mapActions} from "vuex"
 
-export default {
-    name: "AddMemberModal",
-    props: {
-        dialog:Boolean
-    },
+    export default {
+        name: "AddMemberModal",
+        props: {
+            dialog:Boolean
+        },
 
-    data: () => ({
-        terms: false,
-        valid: false,
-        adding: false,
-        member: '',
-        title: '',
-        major: '',
-        picture:'',
-        type:''
-    }),
-
-    methods: {
-        ...rules,
-
-        ...mapActions({
-            addMember: "aboutus/addAboutUs"
+        data: () => ({
+            terms: false,
+            valid: false,
+            adding: false,
+            member: '',
+            title: '',
+            major: '',
+            picture:'',
+            type:''
         }),
 
-        async submit () {
-            this.adding = true
-            const aboutus_attributes = {}
-            aboutus_attributes['hdmember'] = this.member
-            aboutus_attributes['title']  = this.title
-            aboutus_attributes['major'] = this.major
-            aboutus_attributes['picture'] = this.picture
-            aboutus_attributes['type'] = 'member'
-            
-            const aboutusJSON ={'attributes':aboutus_attributes}
-            
-            const response =  await this.addMember(aboutusJSON)
-            
-            this.adding = false        
-        
-            if(response !== 'error'){
-                this.close()          
-            }    
-        },
+        methods: {
+            ...rules,
 
-        /** 
-         * Closes the AddMultimediaModal
-         */
-        close() {
-            this.clear()
-            this.$emit("update:dialog", false)
-        },
+            ...mapActions({
+                addMember: "aboutus/addAboutUs"
+            }),
 
-        clear() {
-            this.terms = false
-            this.member = ''
-            this.title = ''
-            this.major = ''
-            this.picture = ''
-            this.type = ''
-            this.$refs.form.resetValidation()
+            /**
+             * Function to be called after the user has
+             * entered valid information in the required
+             * fields and has agreed to terms.
+             */
+            async submit () {
+                this.adding = true
+                const aboutus_attributes = {}
+                aboutus_attributes['hdmember'] = this.member
+                aboutus_attributes['title']  = this.title
+                aboutus_attributes['major'] = this.major
+                aboutus_attributes['picture'] = this.picture
+                aboutus_attributes['type'] = 'member'
+                
+                const aboutusJSON ={'attributes':aboutus_attributes}
+                
+                const response =  await this.addMember(aboutusJSON)
+                
+                this.adding = false        
+            
+                if(response !== 'error'){
+                    this.close()          
+                }    
+            },
+
+            /** 
+             * Closes the AddMemberModal dialog.
+             */
+            close() {
+                this.clear()
+                this.$emit("update:dialog", false)
+            },
+
+            /**
+             * Clears and resets all fields in the form.
+             */
+            clear() {
+                this.terms = false
+                this.member = ''
+                this.title = ''
+                this.major = ''
+                this.picture = ''
+                this.type = ''
+                this.$refs.form.resetValidation()
+            }
         }
     }
-}
 </script>
