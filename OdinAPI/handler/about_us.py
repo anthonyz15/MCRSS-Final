@@ -7,13 +7,12 @@ class AboutUsHandler:
     def mapAboutUsToDict(self, record):
         """
         Summary:
-            Converts a multimedia post record returned by the MultimediaDAO into a dictionary and returns it.
-
+            Converts the AboutUs records returned by the AbourUsDAO into a dictionary and returns it.
         Params:
-            record: a multimedia post record in the database with its information.
+            record - An AboutUs record in the database with its information.
         
         Returns:
-            A dictionay containing the multimedia post information given in the record.
+            A dictionay containing the aboutus information in the given record.
         """
 
         result = {}
@@ -26,18 +25,16 @@ class AboutUsHandler:
         
         return result
 
-    # def addMultimedia(self, attributes):
     def addAboutUs(self, attributes):
         """
         Summary:
-            Adds a new multimedia post with the information given and maps the result to a JSON object that 
-            contains the information of the newly added multimedia post
+            Adds an AboutUs card with the information given
         
         Params:
-            attributes: a dictionary containing the attributes of the multimedia post to be added.
+            Attributes: This contains the information used in the dictionary.
         
         Returns:
-            A JSON object containing the information of the newly added multimedia post.
+            A JSON object containing the information of new AboutUs object.
         """
         
         #Validate request json attributes comply with the system specifications
@@ -48,42 +45,41 @@ class AboutUsHandler:
         dao = AboutUsDAO()
 
         try:
-            #Add multimedia post using DAO
+            #Add an AboutUs using DAO
             result = dao.addAboutUs(attributes['hdmember'], attributes['title'], attributes['major'], attributes['picture'], attributes['type'])
 
-            #Fetch newly created multimedia post by its id to return
+            #Fetch newly created AboutUs by its id to return
             aboutUs = dao.getAboutUsByID(result)
             dao._closeConnection()
 
-            #Convert multimedia post record into a dictionary
+            #Convert AboutUs record into a dictionary
             mappedResult = self.mapAboutUsToDict(aboutUs)
             return jsonify(AboutUs = mappedResult), 201
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Ocurrió un error interno tratando de añadir una nueva publicación multimedia."), 500
+            return jsonify(Error = "Ocurrió un error interno tratando de añadir una nuevo record."), 500
 
     def getAllAboutUs(self):
         """
         Summary:
-            Gets a list of all multimedia posts that are valid in the database and maps the result to a JSON
-            object containing all the valid multimedia posts and their information. The JSON objects is then 
+            Gets a list of all aboutus info that are valid in the database and maps the result to a JSON
+            object containing all the valid aboutus'. The JSON objects is then 
             returned or an error if otherwise. 
-
         Returns:
-            A JSON object containing all valid multimedia posts and their information.
+            A JSON object containing all valid aboutus'.
         """
     
         dao = AboutUsDAO()
         
         try:
-            #Get all multimedia posts using DAO
+            #Get all AboutUs records using DAO
             result = dao.getAllAboutUs()
             dao._closeConnection()
             if not result:
-                return jsonify(Error = "Ninguna publicación multimedia fue encontrada."), 404
+                return jsonify(Error = "Ningun record de AboutUs fue encontrado."), 404
 
-            #Convert multimedia post records into a list of dictionaries
+            #Convert About Us records into a list of dictionaries
             mappedResult = []
             for aboutus in result:
                 mappedResult.append(self.mapAboutUsToDict(aboutus))
@@ -91,74 +87,71 @@ class AboutUsHandler:
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Ocurrió un error interno buscando todas las publicaciones multimedia."), 500
+            return jsonify(Error = "Ocurrió un error interno buscando todos los records de AboutUs."), 500
 
     def getAboutUsByID(self, hdID):
         """
         Summary:
-            Gets a single multimedia post specified by the given multimedia post id that is valid in the 
+            Gets a single aboutus record specified by the given aboutus id that is valid in the 
             database and maps the result to a JSON object containing its information. The JSON objects is 
             then returned or an error if otherwise. 
-
         Params:
-            mID: the id of the multimedia post id to be fetched.
-
+            hdID: the id of AboutUs to be fetched.
         Returns:
-            A JSON object containing all the information of the valid multimedia post with the given multimedia post id.
+            A JSON object containing all the information of the valid AboutUs with the given record id.
         """
 
-        #Validate multimedia post id is an intenger greater than 0
-        # if not isinstance(hdID, int) or mID < 1:
-        #     return jsonify(Error = "El identificador de la publicación multimedia no es válido."), 400
+        #Validate AboutUs id is an intenger greater than 0
+        # if not isinstance(hdID, int) or hdID < 1:
+        #     return jsonify(Error = "El identificador del AboutUs no es válido."), 400
         
         dao = AboutUsDAO()
         
+        
         try:
-            #Check if multimedia post with given id exists-----------------------------------------------------------------------------
+            #Check if AboutUs record with given id exists
             if not dao.aboutUsExists(hdID):
                 dao._closeConnection()
-                return jsonify(Error = "No existe una publicación multimedia con el identificador: {}".format(hdID)), 404
+                return jsonify(Error = "No existe eel AboutUs con el identificador: {}".format(hdID)), 404
 
-            #Get multimedia post given its id using DAO
+            #Get AboutUs record by using its Id in the DAO
             aboutUs = dao.getAboutUsByID(hdID)
             dao._closeConnection()
 
-            #Convert multimedia post record into a dictionary
+            #Convert AboutUs record into a dictionary
             mappedResult = self.mapAboutUsToDict(aboutUs)
             return jsonify(AboutUs = mappedResult), 200
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Ocurrió un error interno buscando una publicación multimedia por su identificador."), 500
+            return jsonify(Error = "Ocurrió un error interno buscando un record de AboutUs por su identificador."), 500
 
     def getAboutUsByType(self, hType):
         """
         Summary:
-            Gets a list of multimedia posts specified by the given multimedia type that are valid in the 
+            Gets a list of ABoutus records specified by the given ABoutUs type that are valid in the 
             database and maps the result to a JSON object containing its information. The JSON objects is 
             then returned or an error if otherwise. 
-
         Params:
-            mType: the type of the multimedia post to be fetched.
-
+            mType: the type of the ABoutUs to be fetched.
         Returns:
-            A JSON object containing all valid multimedia posts and their information of the given type.        
+            A JSON object containing all valid AboutUs records and their information of the given type.        
         """
 
-        #Validate that the type of multimedia exists
+        #Validate that the type of ABoutUs exists
         if not (hType == 'description' or hType == 'captain' or hType == 'member'): 
-            return jsonify(Error = "El identificador del tipo de multimedia dado no es válido."), 400
+            return jsonify(Error = "El identificador del tipo de aboutus dado no es válido."), 400
         
         dao = AboutUsDAO()
         
         try:  
-            #Get multimedia post given its type using DAO
+            #Get AboutUs record given its type using DAO
             result = dao.getAboutUsByType(hType) 
             dao._closeConnection()
             if not result:
-                return jsonify(Error = "Ninguna publicación del tipo de multimedia dado fue encontrada."), 404
+                return jsonify(Error = "Ningun record de aboutus, con su tipo especificado fue encontrada."), 404
 
-            #Convert multimedia post records of the given type into a list of dictionaries
+            #Convert AboutUs records of the given type into a list of dictionaries
             mappedResult = []
             for aboutUs in result:
                 mappedResult.append(self.mapAboutUsToDict(aboutUs))
@@ -166,28 +159,28 @@ class AboutUsHandler:
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Occurrió un error interno buscando publicaciones del tipo de multimedia dado."), 500
+            return jsonify(Error = "Occurrió un error interno buscando un record de aboutus, con su tipo especificado dado."), 500
 
     def editAboutUs(self, hdID, attributes):
         """
         Summary:
-            Edits the attributes of an existing multimedia post that is valid in the database with the given 
-            multimedia post id and maps the result to a JSON object that contains the information of the newly
-            updated multimedia post
+            Edits the attributes of an existing aboutus that is valid in the database with the given 
+            aboutus id and maps the result to a JSON object that contains the information of the newly
+            updated aboutusrecord.
         
         Params:
-            mID: the id of the multimedia post to be edited.
-            attributes: a dictionary containing the attributes of the multimedia post to be edited.
+            hdID: the id of the aboutus record to be edited.
+            attributes: a dictionary containing the attributes of the aboutus to be edited.
         
         Returns:
-            A JSON object containing the information of the edited multimedia post.
+            A JSON object containing the information of the edited aboutus.
         """
         
-        #Validate multimedia post id is an intenger greater than 0-------------------------------------- comentarios real-----------------
-        # if not isinstance(mID, int) or mID < 1:
-        #     return jsonify(Error = "El identificador de la publicación multimedia dado no es válido."), 400
+        #Validate aboutus id is an intenger greater than 0
+        # if not isinstance(hdID, int) or hdID < 1:
+        #     return jsonify(Error = "El identificador del aboutus record dado no es válido."), 400
 
-        #Validate request json attributes comply with the system specifications----------------- comentarios real-------------
+        #Validate request json attributes comply with the system specifications
         validationResult = self._validateUpdateAttributes(attributes)
         if isinstance(validationResult, str):
             return jsonify(Error = validationResult), 400
@@ -195,69 +188,66 @@ class AboutUsHandler:
         dao = AboutUsDAO()
         
         try:
-            #Check if multimedia post with given id exists----------------- comentarios real-------------
             if not dao.aboutUsExists(hdID):
                 dao._closeConnection()
-                return jsonify(Error = "No existe una publicación multimedia con identificador: {}".format(hdID)), 404
+                return jsonify(Error = "No existe un record de aboutus con identificador: {}".format(hdID)), 404
 
-            #Edit multimedia post using DAO
+            #Edit aboutus record using DAO
             result = dao.editAboutUs(hdID, attributes['hdmember'], attributes['title'], attributes['major'], attributes['picture'])
 
-            #Fetch newly updated multimedia post by its id to return
+            #Fetch updated aboutus record by its id to return
             aboutUs = dao.getAboutUsByID(result)
             dao._closeConnection()
 
-            #Convert multimedia post record into a dictionary
+            #Convert aboutus record into a dictionary
             mappedResult = self.mapAboutUsToDict(aboutUs)
             return jsonify(AboutUs = mappedResult), 200
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Ocurrió un error interno editando una publicación multimedia existente."), 500
+            return jsonify(Error = "Ocurrió un error interno editando un record de aboutus existente."), 500
     
     def removeAboutUs(self, hdID):
         """
         Summary:
-            Invalidates in the database a multimedia post with the given multimedia post id.
-            This effectively acts as a removal of the multimedia post from the system.
+            Invalidates in the database an aboutus with the given aboutus id.
         
         Params:
-            mID: the id of the multimedia post to invalidate.
+            hdID: the id of the aboutus post to invalidate.
         
         Returns:
-            A JSON object containing the id of the updated and invalid multimedia post.
+            A JSON object containing the id of the updated and invalid AboutUs record.
         """
         
-        #Validate multimedia post id is an intenger greater than 0
-        # if not isinstance(mID, int) or mID < 1:
-        #     return jsonify(Error = "El identificador de la publicación multimedia dado no es válido."), 400
+        #Validate aboutus id is an intenger greater than 0
+        # if not isinstance(hdID, int) or hdID < 1:
+        #     return jsonify(Error = "El identificador del AboutUs dado no es válido."), 400
 
         dao = AboutUsDAO()
         
         try:
-            #Check if multimedia post with given id exists
+            #Check if AboutUs record with given id exists
             if not dao.aboutUsExists(hdID):
                 dao._closeConnection()
-                return jsonify(Error = "No existe una publicación multimedia con identificador: {}".format(hdID)), 404
+                return jsonify(Error = "No existe un AboutUs con identificador: {}".format(hdID)), 404
 
-            #Remove multimedia post using DAO
+            #Remove aboutus using DAO
             result = dao.removeAboutUs(hdID)
             dao._closeConnection()
             if not result:
-                return jsonify(Error = "Occurrió un error interno removiendo una publicación multimedia existente"), 500
-            return jsonify(Multimedia = "Se removió la publicación multimedia con identificador: {}".format(result)), 200
+                return jsonify(Error = "Occurrió un error interno removiendo un record de AboutUs existente"), 500
+            return jsonify(AboutUs = "Se removió el AboutUs con identificador: {}".format(result)), 200
         except Exception as e:
             print(e)
             dao._closeConnection()
-            return jsonify(Error = "Ocurrió un error interno removiendo una publicación multimedia existente"), 500
+            return jsonify(Error = "Ocurrió un error interno removiendo un record de aboutus existente"), 500
 
     def _validateInsertAttributes(self,attributes):
         """
         Summary:
-            Validates the attributes dictionary given to add a multimedia post.
-
+            Validates the attributes dictionary given to add an aboutus record.
         Params:
-            attributes: a dictionary containing the attributes of the multimedia post to be added.
+            attributes: a dictionary containing the attributes of the aboutus record to be added.
         
         Returns:
             A string with an error message if the validation fails an integer otherwise.        
@@ -293,7 +283,7 @@ class AboutUsHandler:
             #Type can take the value of: text, image, video, or livestream. 
             if not hType or not (hType == 'description' or hType == 'captain' or hType == 'member'): 
                 print(hType)
-                return "El identificador del tipo de multimedia dado no es válido."
+                return "El identificador del tipo de AboutUs dado no es válido."
 
         except Exception as e:
             print(e)
@@ -305,10 +295,9 @@ class AboutUsHandler:
     def _validateUpdateAttributes(self,attributes):
         """
         Summary:
-            Validates the attributes dictionary given to edit a multimedia post.
-
+            Validates the attributes dictionary given to edit an Aboutus record.
         Params:
-            attributes: a dictionary containing the attributes of the multimedia post to be edited.
+            attributes: a dictionary containing the attributes of the aboutus record to be edited.
         
         Returns:
             A string with an error message if the validation fails an integer otherwise.        
@@ -345,4 +334,4 @@ class AboutUsHandler:
             return "Los argumentos dados no son válidos."
         
         #If succesful return 1
-        return 1  
+        return 1
