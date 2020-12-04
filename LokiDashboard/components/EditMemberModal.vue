@@ -18,12 +18,9 @@
                 <v-card-text>       
                     <v-form v-model="valid" ref="form">
                         <v-container>
-
                             <v-row justify="start">
                                 <v-col md="3">
-
                                     <h2>Miembro:</h2>
-                        
                                 </v-col>
                             </v-row>
 
@@ -79,6 +76,7 @@
                         <small>*indica un campo requirido</small>
                     </v-form> 
                 </v-card-text>
+
                 <v-card-actions>
                     <v-spacer></v-spacer>
                         <v-btn 
@@ -104,79 +102,82 @@
 </template>
 
 <script>
-import rules from "@/utils/validations"  
-import { mapActions } from "vuex"
+    import rules from "@/utils/validations"  
+    import { mapActions } from "vuex"
 
-export default {
-    name: "EditMemberModal",
-    props:{
-        dialog:Boolean,
-        hdid:Number,
-        member:String,
-        title:String,
-        major:String,
-        picture:String
-    },
+    export default {
+        name: "EditMemberModal",
+        props:{
+            dialog:Boolean,
+            hdid:Number,
+            member:String,
+            title:String,
+            major:String,
+            picture:String
+        },
 
-    data: () => ({
-        terms: false,
-        valid: false,
-        editing: false,
-        member_: '',
-        title_: '',
-        major_: '',
-        picture_: ''
+        data: () => ({
+            terms: false,
+            valid: false,
+            editing: false,
+            member_: '',
+            title_: '',
+            major_: '',
+            picture_: ''
 
-    }),
-
-    methods: {
-        ...rules,
-
-        ...mapActions({
-            editMember:"aboutus/editAboutUs"
         }),
 
-        /**
-         * Function to be called after the user 
-         * has entered valid information in the required
-         * field.
-         */
-        async submit () {
-            this.editing = true
-            const aboutus_attributes = {}
-        
-            aboutus_attributes['hdmember'] = this.member_
-            aboutus_attributes['title'] = this.title_
-            aboutus_attributes['major']  = this.major_
-            aboutus_attributes['picture'] = this.picture_
-            
-            const aboutusJSON ={'aboutus_id': this.hdid, 'attributes': aboutus_attributes}
-            
-            const response =  await this.editMember(aboutusJSON)
-            
-            this.editing = false        
-        
-            if(response !== 'error'){
-                this.close()          
-            }    
-        },
+        methods: {
+            ...rules,
 
-        /**
-         * Closes the EditMultimediaModal
-         */
-        close() {
-            this.clear()
-            this.$emit("update:dialog", false)
-        },
+            ...mapActions({
+                editMember:"aboutus/editAboutUs"
+            }),
 
-        clear() {
-            this.$refs.form.resetValidation()
-            this.terms = false
-            this.member_ = ''
-            this.title_ = ''
-            this.major_ = ''
-            this.picture_ = ''
+            /**
+             * Function to be called after the user 
+             * has entered valid information in the required
+             * field and has agreed to terms.
+             */
+            async submit () {
+                this.editing = true
+                const aboutus_attributes = {}
+            
+                aboutus_attributes['hdmember'] = this.member_
+                aboutus_attributes['title'] = this.title_
+                aboutus_attributes['major']  = this.major_
+                aboutus_attributes['picture'] = this.picture_
+                
+                const aboutusJSON ={'aboutus_id': this.hdid, 'attributes': aboutus_attributes}
+                
+                const response =  await this.editMember(aboutusJSON)
+                
+                this.editing = false        
+            
+                if(response !== 'error'){
+                    this.close()          
+                }    
+            },
+
+            /**
+             * Closes the EditMemberModal dialog.
+             */
+            close() {
+                this.clear()
+                this.$emit("update:dialog", false)
+            },
+
+            /**
+             * Clears and resets all fields in the form.
+             */
+            clear() {
+                this.$refs.form.resetValidation()
+                this.terms = false
+                this.member_ = ''
+                this.title_ = ''
+                this.major_ = ''
+                this.picture_ = ''
+            }
         }
     }
-}
 </script>
