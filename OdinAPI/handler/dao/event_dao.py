@@ -66,7 +66,7 @@ class EventDAO:
                    from event
                    where is_invalid=false
                    and event_date > %s::timestamp + '1 day'::INTERVAL
-                   and event_date < %s::timestamp + '1 day'::INTERVAL + '35 minutes'::INTERVAL
+                   and event_date < %s::timestamp + '1 day'::INTERVAL + '32 minutes'::INTERVAL
                 """
         result = None
         try:

@@ -82,11 +82,6 @@
         <v-card
       class="mx-auto my-4" min-height=400 width='250'>
       <v-card-text >
-      <!-- <h1 align="left" justify="center" class="mt-3"> EN VIVO  <v-icon
-        color="red"
-        large
-      >mdi-access-point</v-icon>
-      </h1> -->
       <h3 align="left" justify="center" class="mt-2" > {{t.title}} </h3>
       
       </v-card-text>

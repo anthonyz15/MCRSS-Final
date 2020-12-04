@@ -2,19 +2,20 @@ from .config.sqlconfig import db_config
 from flask import jsonify
 import psycopg2
 
+
 class MultimediaDAO:
 
     def __init__(self):
-        #Extract relational database credentials.
+        # Extract relational database credentials.
         connection_url = "dbname={} user={} password={} host={} ".format(
-        db_config['database'],
-        db_config['username'],
-        db_config['password'],
-        db_config['host']
+            db_config['database'],
+            db_config['username'],
+            db_config['password'],
+            db_config['host']
         )
-        
-        #Establish a connection with the relational database.
-        self.conn = psycopg2.connect(connection_url) 
+
+        # Establish a connection with the relational database.
+        self.conn = psycopg2.connect(connection_url)
 
     def addMultimedia(self, title, content, mType, duid):
         """
@@ -32,30 +33,30 @@ class MultimediaDAO:
         Returns:
             The id of the newly added multimedia post
         """
-        cursor = self.conn.cursor() 
+        cursor = self.conn.cursor()
 
-        query = "insert into multimedia (title, content, type, date_published, is_invalid, duid)"\
+        query = "insert into multimedia (title, content, type, date_published, is_invalid, duid)" \
                 "values (%s, %s, %s, current_timestamp, false, %s) returning mid;"
 
         mID = None
-        
+
         try:
-            cursor.execute(query, (title, content, mType, duid,))       
+            cursor.execute(query, (title, content, mType, duid,))
             mID = cursor.fetchone()[0]
             cursor.close()
             if not mID:
-                return "Occurrió un error interno tratando de añadir una publicación multimedia."       
+                return "OccurriÃ³ un error interno tratando de aÃ±adir una publicaciÃ³n multimedia."
         except psycopg2.DatabaseError as e:
             print(e)
-            return "Occurrió un error interno tratando de añadir una publicación multimedia."
-        
-        #Commits the changes done on the database after insertion
+            return "OccurriÃ³ un error interno tratando de aÃ±adir una publicaciÃ³n multimedia."
+
+        # Commits the changes done on the database after insertion
         try:
-            self._commitChanges()                   
+            self._commitChanges()
         except:
-            return "Occurrió un error interno tratando de añadir una publicación multimedia."
-        
-        #Return id of the newly created multimedia post
+            return "OccurriÃ³ un error interno tratando de aÃ±adir una publicaciÃ³n multimedia."
+
+        # Return id of the newly created multimedia post
         return mID
 
     def getAllMultimedia(self):
@@ -72,10 +73,11 @@ class MultimediaDAO:
         query = """select mid, title, content, type, date_published
                    from multimedia
                    where is_invalid = false
+                   order by date_published desc
                 """
-        
+
         result = []
-        
+
         try:
             cursor.execute(query)
             for row in cursor:
@@ -83,7 +85,7 @@ class MultimediaDAO:
             return result
         except psycopg2.DatabaseError as e:
             print(e)
-            return "Ocurrió un error interno buscando todas las publicaciones multimedia."
+            return "OcurriÃ³ un error interno buscando todas las publicaciones multimedia."
 
     def getMultimediaByID(self, mID):
         """
@@ -97,23 +99,23 @@ class MultimediaDAO:
         Returns:
             A list containing all the information of the valid multimedia post with the given multimedia post id.
         """
-        
+
         cursor = self.conn.cursor()
-        
+
         query = """select mid, title, content, type, date_published
                    from multimedia
                    where mid = %s
                    and is_invalid = false
                 """
-        
+
         try:
-            cursor.execute(query,(mID,))
+            cursor.execute(query, (mID,))
             result = cursor.fetchone()
             return result
         except psycopg2.DatabaseError as e:
             print(e)
-            return "Ocurrió un error interno buscando una publicación multimedia por su identificador."
-    
+            return "OcurriÃ³ un error interno buscando una publicaciÃ³n multimedia por su identificador."
+
     def getMultimediaByType(self, mType):
         """
         Summary:
@@ -133,10 +135,11 @@ class MultimediaDAO:
                    from multimedia
                    where type = %s
                    and is_invalid = false
+                   order by date_published desc
                 """
 
         result = []
-        
+
         try:
             cursor.execute(query, (mType,))
             for row in cursor:
@@ -144,7 +147,7 @@ class MultimediaDAO:
             return result
         except psycopg2.DatabaseError as e:
             print(e)
-            return "Occurrió un error interno buscando publicaciones del tipo de multimedia dado."
+            return "Occurrio un error interno buscando publicaciones del tipo de multimedia dado."
 
     def getMultimediaByAuthor(self, duid):
         """
@@ -156,20 +159,21 @@ class MultimediaDAO:
             duid: the dashboard user id of the author of the multimedia post.
 
         Returns:
-            A list containing all the valid multimedia posts with their information and are authored by the dashboard 
+            A list containing all the valid multimedia posts with their information and are authored by the dashboard
             user with the given id.
         """
 
         cursor = self.conn.cursor()
-        
+
         query = """select mid, title, content, type, date_published
                    from multimedia as M inner join dashboard_user as DU on M.duid=DU.id
                    where DU.id = %s 
                    and M.is_invalid = false
+                   order by date_published desc
                 """
-        
+
         result = []
-        
+
         try:
             cursor.execute(query, (duid,))
             for row in cursor:
@@ -177,12 +181,12 @@ class MultimediaDAO:
             return result
         except psycopg2.DatabaseError as e:
             print(e)
-            return "Occurrió un error interno buscando publicaciones de multimedia del autor dado." 
+            return "OccurriÃ³ un error interno buscando publicaciones de multimedia del autor dado."
 
     def editMultimedia(self, mID, title, content):
         """
         Summary:
-            Updates an existing multimedia post in the database using the given title, content, type of multimedia, 
+            Updates an existing multimedia post in the database using the given title, content, type of multimedia,
             and author, returning the id of the newly updated multimedia post if succesful, or an error if otherwise.
 
         Params:
@@ -197,33 +201,33 @@ class MultimediaDAO:
         """
 
         cursor = self.conn.cursor()
-        
+
         query = """update multimedia
                    set title = %s,
                        content = %s
                    where mid = %s
                    returning mid
                 """
-        
+
         result = None
-        
+
         try:
-            cursor.execute(query,(title, content, mID,))
+            cursor.execute(query, (title, content, mID,))
             result = cursor.fetchone()
             if not result:
-                return "Occurrió un error interno editando una publicación multimedia existente."
+                return "OccurriÃ³ un error interno editando una publicaciÃ³n multimedia existente."
         except Exception as e:
             print(e)
-            return "Ocurrió un error interno editando una publicación multimedia existente."             
-        
+            return "OcurriÃ³ un error interno editando una publicaciÃ³n multimedia existente."
+
         try:
-            self._commitChanges()                  
+            self._commitChanges()
         except:
-            return "Ocurrió un error interno editando una publicación multimedia existente."            
-       
-        #Return id of the newly updated multimedia post
-        return result[0] 
-    
+            return "OcurriÃ³ un error interno editando una publicaciÃ³n multimedia existente."
+
+            # Return id of the newly updated multimedia post
+        return result[0]
+
     def removeMultimedia(self, mID):
         """
         Summary:
@@ -236,33 +240,33 @@ class MultimediaDAO:
         Returns:
             The id of the updated and invalid multimedia post.
         """
-        
+
         cursor = self.conn.cursor()
-        
+
         query = """update multimedia
                    set is_invalid = true
                    where mid = %s
                    returning mid;
                 """
-        
+
         result = None
-        
+
         try:
-            cursor.execute(query, (mID, ))
+            cursor.execute(query, (mID,))
             result = cursor.fetchone()
             if not result:
-                return "Occurrió un error interno removiendo una publicación multimedia existente."
+                return "OccurriÃ³ un error interno removiendo una publicaciÃ³n multimedia existente."
         except Exception as e:
             print(e)
-            return "Ocurrió un error interno removiendo una publicación multimedia existente."             
-        
-        try:
-            self._commitChanges()                  
-        except:
-            return "Ocurrió un error interno removiendo una publicación multimedia existente."  
+            return "OcurriÃ³ un error interno removiendo una publicaciÃ³n multimedia existente."
 
-        #Return id of the newly updated multimedia post
-        return result[0] 
+        try:
+            self._commitChanges()
+        except:
+            return "OcurriÃ³ un error interno removiendo una publicaciÃ³n multimedia existente."
+
+            # Return id of the newly updated multimedia post
+        return result[0]
 
     def multimediaExists(self, mID):
         """
@@ -275,24 +279,24 @@ class MultimediaDAO:
         Returns:
             True if the multimedia post exists, false otherwise.
         """
-        
+
         cursor = self.conn.cursor()
-        
+
         exists = True
-        
+
         query = """select mID
                    from multimedia
                    where mID = %s
                    and is_invalid = false
                 """
         try:
-            cursor.execute(query,(mID,))
+            cursor.execute(query, (mID,))
             if not cursor.fetchone():
                 exists = False
         except Exception as e:
             print(e)
             exists = False
-        
+
         return exists
 
     def _commitChanges(self):

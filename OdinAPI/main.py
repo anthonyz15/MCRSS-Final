@@ -9,6 +9,8 @@ from customSession import CustomSession
 from functools import wraps
 from dotenv import load_dotenv
 import os
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from handler.position import PositionHandler
 from handler.event import EventHandler
@@ -27,6 +29,8 @@ from handler.event_result import EventResultHandler
 from handler.medal_based_event import MedalBasedEventHandler
 from handler.multimedia import MultimediaHandler
 from handler.about_us import AboutUsHandler
+from handler.notifications_handler import NotificationHandler
+
 
 
 # Load environment variables
@@ -38,7 +42,10 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 customSession = CustomSession()
 CORS(app)
-
+notification_handler = NotificationHandler()
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=notification_handler.schedule_notifications, trigger="interval", minutes=30)
+scheduler.start()
 
 def token_check(func):
     """
@@ -3857,6 +3864,7 @@ def medalbasedAggregateTeamStatistics():
 # ===================//END MEDAL BASED RESULTS ROUTES//===============================
 # ===================================================================================
 
+atexit.register(lambda: scheduler.shutdown())
 
 # Launch app.
 if __name__ == '__main__':
