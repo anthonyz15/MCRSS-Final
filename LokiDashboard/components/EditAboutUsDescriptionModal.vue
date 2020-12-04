@@ -18,12 +18,9 @@
                 <v-card-text>       
                     <v-form v-model="valid" ref="form">
                         <v-container>
-
                             <v-row justify="start">
                                 <v-col md="4">
-
                                     <h2>Descripción:</h2>
-                        
                                 </v-col>
                             </v-row>
 
@@ -50,6 +47,7 @@
                         <small>*indica un campo requirido</small>
                     </v-form> 
                 </v-card-text>
+
                 <v-card-actions>
                     <v-spacer></v-spacer>
                         <v-btn 
@@ -75,68 +73,71 @@
 </template>
 
 <script>
-import rules from "@/utils/validations"  
-import { mapActions } from "vuex"
+    import rules from "@/utils/validations"  
+    import { mapActions } from "vuex"
 
-export default {
-    name: "EditAboutUsDescriptionModal",
-    props:{
-        dialog:Boolean,
-        title:String,
-    },
+    export default {
+        name: "EditAboutUsDescriptionModal",
+        props:{
+            dialog:Boolean,
+            title:String,
+        },
 
-    data: () => ({
-        terms: false,
-        valid: false,
-        editing: false,
-        title_: ''
-    }),
-
-    methods: {
-        ...rules,
-
-        ...mapActions({
-            editAboutUsDescription:"aboutus/editAboutUs"
+        data: () => ({
+            terms: false,
+            valid: false,
+            editing: false,
+            title_: ''
         }),
 
-        /**
-         * Function to be called after the user 
-         * has entered valid information in the required
-         * field.
-         */
-        async submit () {
-            this.editing = true
-            const aboutus_attributes = {}
-        
-            aboutus_attributes['hdmember'] = 'description'
-            aboutus_attributes['title'] = this.title_
-            aboutus_attributes['major']  = 'description'
-            aboutus_attributes['picture'] = 'decription'
-            
-            const aboutusJSON ={'aboutus_id': 9, 'attributes': aboutus_attributes}
-            
-            const response =  await this.editAboutUsDescription(aboutusJSON)
-            
-            this.editing = false        
-        
-            if(response !== 'error'){
-                this.close()          
-            }    
-        },
+        methods: {
+            ...rules,
 
-        /**
-         * Closes the EditMultimediaModal
-         */
-        close() {
-            this.clear()
-            this.$emit("update:dialog", false)
-        },
+            ...mapActions({
+                editAboutUsDescription:"aboutus/editAboutUs"
+            }),
 
-        clear() {
-            this.$refs.form.resetValidation()
-            this.terms = false
-            this.title_ = ''
+            /**
+             * Function to be called after the user 
+             * has entered valid information in the required
+             * field and has agreed to terms.
+             */
+            async submit () {
+                this.editing = true
+                const aboutus_attributes = {}
+            
+                aboutus_attributes['hdmember'] = 'description'
+                aboutus_attributes['title'] = this.title_
+                aboutus_attributes['major']  = 'description'
+                aboutus_attributes['picture'] = 'decription'
+                
+                const aboutusJSON ={'aboutus_id': 9, 'attributes': aboutus_attributes}
+                
+                const response =  await this.editAboutUsDescription(aboutusJSON)
+                
+                this.editing = false        
+            
+                if(response !== 'error'){
+                    this.close()          
+                }    
+            },
+
+            /**
+             * Closes the EditAboutUsDescriptionModal dialog.
+             */
+            close() {
+                this.clear()
+                this.$emit("update:dialog", false)
+            },
+
+            /**
+             * Clears and resets all fields in the form.
+             */
+            clear() {
+                this.$refs.form.resetValidation()
+                this.terms = false
+                this.title_ = ''
+            }
         }
     }
-}
 </script>
